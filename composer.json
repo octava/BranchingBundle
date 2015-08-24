@@ -1,0 +1,14 @@
+{
+    "name": "octava/branching",
+    "description": "BranchingBundle for symdep",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Vladimir Pak",
+            "email": "TheRatW@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
