@@ -16,14 +16,14 @@ class SwitchDbNameCompiler implements CompilerPassInterface
         $originalDbName = $container->getParameter('database_name');
         $container->setParameter('database_name_original', $originalDbName);
 
-        if (!$container->getParameter('the_rat_branching.switch_db')
+        if (!$container->getParameter('octava_branching.switch_db')
             || false === strpos($container->getParameter('database_driver'), 'mysql')
             || false === in_array($container->getParameter('kernel.environment'), ['dev', 'test'])
         ) {
             return;
         }
 
-        $helper = $container->get('the_rat_branching.helper.database');
+        $helper = $container->get('octava_branching.helper.database');
         $branchDbName = $helper->generateDatabaseName();
 
         if ($originalDbName != $branchDbName) {

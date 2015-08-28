@@ -47,7 +47,7 @@ After that run 'app/console' command, and bundle create and copy new database au
 ```
 # Default configuration for "BranchingBundle"
 
-the_rat_branching:
+octava_branching:
     switch_db: true     #enable or disable auto switch db
     copy_db_data: true  #copy db from root db
 ```

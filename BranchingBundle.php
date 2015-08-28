@@ -2,11 +2,11 @@
 
 namespace Octava\Bundle\BranchingBundle;
 
+use Octava\Bundle\BranchingBundle\DependencyInjection\Compiler\SwitchDbNameCompiler;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Octava\Bundle\BranchingBundle\DependencyInjection\Compiler\SwitchDbNameCompiler;
 
-class OctavaBranchingBundle extends Bundle
+class BranchingBundle extends Bundle
 {
     public function build(ContainerBuilder $container)
     {

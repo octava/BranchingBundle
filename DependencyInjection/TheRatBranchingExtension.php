@@ -22,8 +22,8 @@ class OctavaBranchingExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
-        $container->setParameter('the_rat_branching.switch_db', $config['switch_db']);
-        $container->setParameter('the_rat_branching.copy_db_data', $config['copy_db_data']);
+        $container->setParameter('octava_branching.switch_db', $config['switch_db']);
+        $container->setParameter('octava_branching.copy_db_data', $config['copy_db_data']);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
