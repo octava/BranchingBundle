@@ -18,17 +18,17 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('branching');
+        $rootNode = $treeBuilder->root('octava_branching');
 
         /** @var ArrayNodeDefinition $rootNode */
         $rootNode
             ->children()
-            ->booleanNode('switch_db')
-            ->defaultFalse()
-            ->end()
-            ->booleanNode('copy_db_data')
-            ->defaultFalse()
-            ->end()
+                ->booleanNode('switch_db')
+                    ->defaultFalse()
+                ->end()
+                ->booleanNode('copy_db_data')
+                    ->defaultFalse()
+                ->end()
             ->end();
 
         return $treeBuilder;

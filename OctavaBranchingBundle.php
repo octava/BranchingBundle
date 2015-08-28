@@ -6,7 +6,7 @@ use Octava\Bundle\BranchingBundle\DependencyInjection\Compiler\SwitchDbNameCompi
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
-class BranchingBundle extends Bundle
+class OctavaBranchingBundle extends Bundle
 {
     public function build(ContainerBuilder $container)
     {
