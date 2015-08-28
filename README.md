@@ -2,7 +2,7 @@
 
 Symfony BranchingBundle. Auto change *mysql* database depends on current git branch.
 
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/e0649e62-91e7-497c-8008-cf7aba6d0ee9/big.png)](https://insight.sensiolabs.com/projects/e0649e62-91e7-497c-8008-cf7aba6d0ee9)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/9336a9c6-7bc5-4a67-a9bb-fa0e13555187/big.png)](https://insight.sensiolabs.com/projects/9336a9c6-7bc5-4a67-a9bb-fa0e13555187)
 
 Bundle version is connected with supported symfony version.
 
