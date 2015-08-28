@@ -2,6 +2,9 @@
 namespace Octava\Bundle\BranchingBundle\Helper;
 
 use Doctrine\DBAL\DriverManager;
+use Monolog\Handler\NullHandler;
+use Psr\Log\LoggerInterface;
+use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\Process\Process;
 
 class Database
@@ -54,20 +57,9 @@ class Database
     protected $dbNameOriginal;
 
     /**
-     * @return string
+     * @var LoggerInterface
      */
-    public function getDriver()
-    {
-        return $this->driver;
-    }
-
-    /**
-     * @return string
-     */
-    public function getDbNameOriginal()
-    {
-        return $this->dbNameOriginal;
-    }
+    protected $logger;
 
     public function __construct(
         $rootDir,
@@ -89,6 +81,43 @@ class Database
         $this->password = $password;
         $this->dbName = $dbName;
         $this->dbNameOriginal = $dbNameOriginal;
+    }
+
+    /**
+     * @return LoggerInterface
+     */
+    public function getLogger()
+    {
+        if (!$this->logger) {
+            $this->logger = new Logger(__CLASS__, [new NullHandler()]);
+        }
+        return $this->logger;
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     * @return self
+     */
+    public function setLogger($logger)
+    {
+        $this->logger = $logger;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDriver()
+    {
+        return $this->driver;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDbNameOriginal()
+    {
+        return $this->dbNameOriginal;
     }
 
     /**
@@ -152,11 +181,9 @@ class Database
         $branchRef = Git::getCurrentBranch($this->getRootDir());
 
         $result = $this->getDbName();
-        if (strpos($branchRef, 'refs/heads/') === 0) {
-            $branchName = $this->prepareBranchName(substr($branchRef, 11));
-            if ('master' != $branchName) {
-                $result = $result . '_branch_' . $branchName;
-            }
+        $branchName = $this->prepareBranchName($branchRef);
+        if ('master' != $branchName) {
+            $result = $result . '_branch_' . $branchName;
         }
         return $result;
     }

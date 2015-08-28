@@ -44,7 +44,7 @@ class GenerateDbCommand extends ContainerAwareCommand
 
             $logger->debug('Create complete');
         } else {
-            $logger->debug('Database already exist');
+            $logger->debug('Database already exist', [$branchDbName]);
         }
     }
 }
