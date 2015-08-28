@@ -1,0 +1,24 @@
+parameters:
+    the_rat_branching.helper.database.class: Octava\Bundle\BranchingBundle\Helper\Database
+    the_rat_branching.twig.branching_extension.class: Octava\Bundle\BranchingBundle\Twig\BranchingExtension
+
+services:
+    the_rat_branching.helper.database:
+        class: %the_rat_branching.helper.database.class%
+        arguments:
+            - %kernel.root_dir%
+            - %the_rat_branching.copy_db_data%
+            - %database_driver%
+            - %database_host%
+            - %database_port%
+            - %database_user%
+            - %database_password%
+            - %database_name%
+            - %database_name_original%
+
+    the_rat_branching.twig.branching_extension:
+        class: %the_rat_branching.twig.branching_extension.class%
+        public: false
+        arguments: [%kernel.root_dir%, %kernel.environment%]
+        tags:
+            - { name: twig.extension }

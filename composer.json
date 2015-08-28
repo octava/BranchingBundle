@@ -1,14 +1,32 @@
 {
     "name": "octava/branching",
-    "description": "BranchingBundle for symdep",
+    "description": "BranchingBundle for symdep. Auto change database depends on еру current git branch.",
     "type": "library",
     "license": "MIT",
     "authors": [
         {
             "name": "Vladimir Pak",
-            "email": "TheRatW@gmail.com"
+            "email": "OctavaW@gmail.com"
         }
     ],
-    "minimum-stability": "dev",
-    "require": {}
+    "minimum-stability": "stable",
+    "require": {
+        "php": ">=5.5.9"
+    },
+    "suggest": {
+        "doctrine/doctrine-bundle": "^1.5",
+        "symfony/dependency-injection": "^2.7",
+        "symfony/process": "^2.7",
+        "symfony/yaml": "^2.7"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.7.x-dev"
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Octava\\Bundle\\BranchingBundle\\": ""
+        }
+    }
 }
