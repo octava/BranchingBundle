@@ -1,13 +1,13 @@
 parameters:
-    octava_branching.helper.database.class: Octava\Bundle\BranchingBundle\Helper\Database
-    octava_branching.twig.branching_extension.class: Octava\Bundle\BranchingBundle\Twig\BranchingExtension
+    branching.helper.database.class: Octava\Bundle\BranchingBundle\Helper\Database
+    branching.twig.branching_extension.class: Octava\Bundle\BranchingBundle\Twig\BranchingExtension
 
 services:
-    octava_branching.helper.database:
-        class: %octava_branching.helper.database.class%
+    branching.helper.database:
+        class: %branching.helper.database.class%
         arguments:
             - %kernel.root_dir%
-            - %octava_branching.copy_db_data%
+            - %branching.copy_db_data%
             - %database_driver%
             - %database_host%
             - %database_port%
@@ -16,8 +16,8 @@ services:
             - %database_name%
             - %database_name_original%
 
-    octava_branching.twig.branching_extension:
-        class: %octava_branching.twig.branching_extension.class%
+    branching.twig.branching_extension:
+        class: %branching.twig.branching_extension.class%
         public: false
         arguments: [%kernel.root_dir%, %kernel.environment%]
         tags:

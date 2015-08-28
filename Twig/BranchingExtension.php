@@ -29,7 +29,7 @@ class BranchingExtension extends \Twig_Extension
      */
     public function getName()
     {
-        return 'octava_branching_extension';
+        return 'branching_extension';
     }
 
     public function getFunctions()

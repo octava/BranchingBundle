@@ -24,7 +24,7 @@ class GenerateDbCommand extends ContainerAwareCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var \Symfony\Component\Console\Output\ConsoleOutput $output */
-        $helper = $this->getContainer()->get('octava_branching.helper.database');
+        $helper = $this->getContainer()->get('branching.helper.database');
         $logger = $helper->getLogger();
         if ($output->isDebug()) {
             $logger->pushHandler(new StreamHandler(STDOUT));
