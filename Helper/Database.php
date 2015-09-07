@@ -72,8 +72,7 @@ class Database
         $password,
         $dbName,
         $dbNameOriginal
-    )
-    {
+    ) {
         $this->rootDir = $rootDir;
         $this->copyDbData = (bool)$copyDbData;
         $this->driver = $driver;
