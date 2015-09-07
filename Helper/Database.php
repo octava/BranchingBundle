@@ -6,6 +6,7 @@ use Monolog\Handler\NullHandler;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\ProcessBuilder;
 
 class Database
 {
@@ -71,7 +72,8 @@ class Database
         $password,
         $dbName,
         $dbNameOriginal
-    ) {
+    )
+    {
         $this->rootDir = $rootDir;
         $this->copyDbData = (bool)$copyDbData;
         $this->driver = $driver;
@@ -203,13 +205,35 @@ class Database
 
         if ($this->isCopyDbData()) {
             $host = $this->getHost();
-            $port = $this->getPort() ? '-P' . $this->getPort() : '';
+            $port = $this->getPort();
             $user = $this->getUser();
-            $password = $this->getPassword() ? '-p' . $this->getPassword() : '';
+            $password = $this->getPassword();
             $srcDbName = $this->getDbName();
 
-            $cmd = "mysqldump -h{$host} {$port} -u{$user} $password {$srcDbName}" .
-                " | mysql -h{$host} ${port} -u{$user} {$password} {$dstDbName}";
+            $cmd = MySqlDump::makeDumpCommand(
+                $host,
+                $port,
+                $user,
+                $password,
+                $srcDbName
+            );
+            $builder = new ProcessBuilder();
+            $builder->setPrefix('mysql');
+            if ($host) {
+                $builder->add("--host=$host");
+            }
+            if ($port) {
+                $builder->add("--port=$port");
+            }
+            if ($user) {
+                $builder->add("--user=$user");
+            }
+            if ($password) {
+                $builder->add("--password=$password");
+            }
+            $builder->add($dstDbName);
+
+            $cmd = $cmd . " | " . $builder->getProcess()->getCommandLine();
 
             $process = new Process(
                 $cmd,
