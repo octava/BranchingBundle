@@ -22,10 +22,13 @@ class OctavaBranchingExtension extends Extension
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
 
+        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader->load('services.yml');
+
         $container->setParameter('octava_branching.switch_db', $config['switch_db']);
         $container->setParameter('octava_branching.copy_db_data', $config['copy_db_data']);
 
-        $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
-        $loader->load('services.yml');
+        $container->getDefinition('octava_branching.config.dump_tables_config')
+            ->addArgument($config['dump_tables']);
     }
 }

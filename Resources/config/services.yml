@@ -6,6 +6,9 @@ parameters:
     octava_branching.service.dump_table.logger.class: Symfony\Bridge\Monolog\Logger
     octava_branching.service.dump_table.logger.file_handler.class: Robo\LoggingBundle\Handler\StreamHandler
     octava_branching.service.dump_table.logger.memory_processor.class: Monolog\Processor\MemoryPeakUsageProcessor
+
+    octava_branching.config.dump_tables_config.class: Octava\Bundle\BranchingBundle\Config\DumpTablesConfig
+
 services:
     octava_branching.helper.database:
         class: %octava_branching.helper.database.class%
@@ -40,6 +43,9 @@ services:
             - 'r12n_project.sync'
             - [@octava_branching.service.dump_table.logger.file_handler]
             - [@octava_branching.service.dump_table.logger.memory_processor]
+
+    octava_branching.config.dump_tables_config:
+       class: %octava_branching.config.dump_tables_config.class%
 
     octava_branching.service.dump_table:
         class: %octava_branching.service.dump_table.class%

@@ -29,6 +29,11 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('copy_db_data')
                     ->defaultFalse()
                 ->end()
+                ->arrayNode('dump_tables')
+                    ->defaultValue([])
+                    ->prototype('scalar')
+                    ->end()
+                ->end()
             ->end();
 
         return $treeBuilder;

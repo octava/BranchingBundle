@@ -20,7 +20,7 @@ class DumpTablesCommand extends ContainerAwareCommand
             ->setName('octava:branching:dump-tables')
             ->addArgument(
                 'entities',
-                InputArgument::IS_ARRAY | InputArgument::REQUIRED,
+                InputArgument::IS_ARRAY | InputArgument::OPTIONAL,
                 'EntityName (example: RoboStructureBundle:Structure)'
             )
             ->addOption('dir', 'd', InputOption::VALUE_REQUIRED, 'Dump dirs (kernel.logs_dir/OctavaBranchingBundle)')
@@ -50,6 +50,19 @@ class DumpTablesCommand extends ContainerAwareCommand
         file_put_contents($allFilename, '', FILE_APPEND);
 
         $entities = $input->getArgument('entities');
+        if (empty($entities)) {
+            $entities = $this->getContainer()
+                ->get('octava_branching.config.dump_tables_config')
+                ->getRepositories();
+            if (!empty($entities)) {
+                $logger->debug('Load entities from octava config', $entities);
+            }
+        }
+
+        if (empty($entities)) {
+            $logger->debug('Empty entities list, you could define list in config.yml');
+            return;
+        }
 
         /** @var EntityManager $entityManager */
         $entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
