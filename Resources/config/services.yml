@@ -4,7 +4,7 @@ parameters:
 
     octava_branching.service.dump_table.class: Octava\Bundle\BranchingBundle\Service\DumpTable
     octava_branching.service.dump_table.logger.class: Symfony\Bridge\Monolog\Logger
-    octava_branching.service.dump_table.logger.file_handler.class: Robo\LoggingBundle\Handler\StreamHandler
+    octava_branching.service.dump_table.logger.file_handler.class: Monolog\Handler\StreamHandler
     octava_branching.service.dump_table.logger.memory_processor.class: Monolog\Processor\MemoryPeakUsageProcessor
 
     octava_branching.config.dump_tables_config.class: Octava\Bundle\BranchingBundle\Config\DumpTablesConfig

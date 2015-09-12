@@ -5,7 +5,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use Monolog\Handler\NullHandler;
 use Monolog\Processor\MemoryPeakUsageProcessor;
-use Robo\LoggingBundle\Handler\StreamHandler;
+use Monolog\Handler\StreamHandler;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,7 +21,7 @@ class DumpTablesCommand extends ContainerAwareCommand
             ->addArgument(
                 'entities',
                 InputArgument::IS_ARRAY | InputArgument::OPTIONAL,
-                'EntityName (example: RoboStructureBundle:Structure)'
+                'EntityName (example: AppAcmeBundle:Blog)'
             )
             ->addOption('dir', 'd', InputOption::VALUE_REQUIRED, 'Dump dirs (kernel.logs_dir/OctavaBranchingBundle)')
             ->setDescription('Make sql dump file for tables and translations by config');
