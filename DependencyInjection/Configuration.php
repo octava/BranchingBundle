@@ -36,6 +36,28 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end();
 
+        $rootNode
+            ->children()
+                ->arrayNode('alter_increment_map')
+                    ->prototype('array')
+                        ->children()
+                            ->arrayNode('test')
+                                ->children()
+                                    ->scalarNode('start')->isRequired()->end()
+                                    ->scalarNode('step')->isRequired()->end()
+                                ->end()
+                            ->end()
+                            ->arrayNode('dev')
+                                ->children()
+                                    ->scalarNode('start')->isRequired()->end()
+                                    ->scalarNode('step')->isRequired()->end()
+                                ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end();
+
         return $treeBuilder;
     }
 }

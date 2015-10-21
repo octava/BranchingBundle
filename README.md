@@ -53,6 +53,15 @@ octava_branching:
     dump_tables:        #list entities for `octava:branching:dump-tables` command
         - AppFaqBundle:Faq
         - AppBundle\Entity\Page\Site
+        
+    alter_increment_map:
+        'AppBalanceBundle:Transaction':
+            test:
+                start: 500000000
+                step: 1000
+            dev:
+                start: 8000000
+                step: 1000
 ```
 
 ### Nginx example

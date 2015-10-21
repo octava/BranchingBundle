@@ -30,5 +30,8 @@ class OctavaBranchingExtension extends Extension
 
         $container->getDefinition('octava_branching.config.dump_tables_config')
             ->addArgument($config['dump_tables']);
+
+        $container->getDefinition('octava.branching.config.alter_increment_config')
+            ->addArgument($config['alter_increment_map']);
     }
 }
