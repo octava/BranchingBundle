@@ -117,7 +117,7 @@ class DropOldDbCommand extends ContainerAwareCommand
      */
     protected function dropDatabaseByName($name, InputInterface $input, OutputInterface $output)
     {
-        $confirmation = false;
+        $confirmation = $input->getOption('force');
         if (!$input->getOption('force')) {
             /** @var \Symfony\Component\Console\Helper\DialogHelper $dialog */
             $dialog = $this->getHelperSet()->get('dialog');
