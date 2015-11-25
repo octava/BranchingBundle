@@ -39,7 +39,7 @@ class ScriptHandler
             . 'config' . DIRECTORY_SEPARATOR
             . $options['file-name'];
         file_put_contents($filename, $yaml);
-        $event->getIO()->write("Generated config parameters ($filename)");
+        $event->getIO()->write("<info>Generated config parameters ($filename)</info>");
     }
 
     protected static function getOptions(CommandEvent $event)
