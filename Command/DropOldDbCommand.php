@@ -4,8 +4,8 @@ namespace Octava\Bundle\BranchingBundle\Command;
 use Doctrine\DBAL\DriverManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class DropOldDbCommand extends ContainerAwareCommand
 {
@@ -111,9 +111,9 @@ class DropOldDbCommand extends ContainerAwareCommand
 
     /**
      * Drop database by name
-     * @param string                                          $name
+     * @param string $name
      * @param \Symfony\Component\Console\Input\InputInterface $input
-     * @param OutputInterface                                 $output
+     * @param OutputInterface $output
      */
     protected function dropDatabaseByName($name, InputInterface $input, OutputInterface $output)
     {
@@ -156,6 +156,7 @@ class DropOldDbCommand extends ContainerAwareCommand
         if (false !== $pos) {
             $result = substr($result, $pos + 1);
         }
+
         return $result;
     }
 }

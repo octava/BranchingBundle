@@ -38,7 +38,7 @@ class AlterIncrementCommand extends ContainerAwareCommand
                 } else {
                     $connection = $this->getContainer()->get('doctrine')->getConnection();
                     $schemaManager = $connection->getSchemaManager();
-                    if ($schemaManager->tablesExist([$tableName]) == true) {
+                    if ($schemaManager->tablesExist([$tableName]) === true) {
                         $query = sprintf('ALTER TABLE `%s` AUTO_INCREMENT = %d', $tableName, $calculatedId);
                         $connection->exec($query);
 
@@ -56,7 +56,7 @@ class AlterIncrementCommand extends ContainerAwareCommand
     protected function getBranchId()
     {
         $rootPath = $this->getContainer()->getParameter('kernel.root_dir');
-        $cmd = 'cd ' . $rootPath . ' && git symbolic-ref HEAD';
+        $cmd = 'cd '.$rootPath.' && git symbolic-ref HEAD';
         $branchName = exec($cmd);
 
         $pos = strrpos($branchName, '/');
@@ -72,6 +72,7 @@ class AlterIncrementCommand extends ContainerAwareCommand
         if (is_numeric($branchName)) {
             $result = (int)$branchName;
         }
+
         return $result;
     }
 
@@ -94,12 +95,14 @@ class AlterIncrementCommand extends ContainerAwareCommand
         } else {
             $result = (int)$result[0]['id'];
         }
+
         return $result;
     }
 
     protected function calculateIncrement($branchId, array $params)
     {
         $result = $params['start'] + $branchId * $params['step'];
+
         return $result;
     }
 }
