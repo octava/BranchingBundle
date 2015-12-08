@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class DumpTablesCommand extends ContainerAwareCommand
@@ -27,12 +28,16 @@ class DumpTablesCommand extends ContainerAwareCommand
             ->setDescription('Make sql dump file for tables and translations by config');
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface|Output $output
+     * @return int|null|void
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $service = $this->getContainer()->get('octava_branching.service.dump_table');
         $logger = $service->getLogger();
-        $verbosity = $output->getVerbosity();
-        if ($verbosity > 1) {
+        if ($output->isDebug()) {
             $logger->pushHandler(new StreamHandler(STDOUT));
         } else {
             $logger->pushHandler(new NullHandler());
