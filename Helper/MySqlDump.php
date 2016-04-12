@@ -11,7 +11,6 @@ class MySqlDump
         $builder->setPrefix('mysqldump');
         $builder->add('--single-transaction');
         $builder->add('--lock-tables');
-        $builder->add('--quick');
         if ($host) {
             $builder->add("--host=$host");
         }
