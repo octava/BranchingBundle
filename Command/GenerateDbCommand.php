@@ -5,6 +5,7 @@ use Monolog\Handler\StreamHandler;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class GenerateDbCommand extends ContainerAwareCommand
@@ -13,6 +14,12 @@ class GenerateDbCommand extends ContainerAwareCommand
     {
         $this
             ->setName('octava:branching:generate-db')
+            ->addOption(
+                'ignore-table-data',
+                'i',
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+                'Do not dump the specified table data.'
+            )
             ->setDescription('Detect current branch and create db')
             ->addArgument(
                 'name',
@@ -40,7 +47,7 @@ class GenerateDbCommand extends ContainerAwareCommand
         $logger->debug('Run command', ['command' => $this->getName(), 'db_name' => $branchDbName]);
 
         if (!$helper->databaseExists($branchDbName)) {
-            $helper->generateDatabase($branchDbName);
+            $helper->generateDatabase($branchDbName, array_map('trim', $input->getOption('ignore-table-data')));
 
             $logger->debug('Database created successfully');
         } else {
