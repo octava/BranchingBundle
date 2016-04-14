@@ -36,7 +36,6 @@ class MySqlDump
         $builder = new ProcessBuilder();
         $builder->setPrefix('mysqldump');
         $builder->add('--no-create-info');
-        $builder->add('--single-transaction');
         $builder->add('--lock-tables');
 
         $ignoreTables = array_filter($ignoreTables);
