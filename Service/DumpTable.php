@@ -39,6 +39,20 @@ class DumpTable
         return $result;
     }
 
+    public function makeCreateDumpCommand()
+    {
+        $connectionParams = $this->getEntityManager()->getConnection()->getParams();
+        $result = MySqlDump::makeCreateDumpCommand(
+            $connectionParams['host'],
+            $connectionParams['port'],
+            $connectionParams['user'],
+            $connectionParams['password'],
+            $connectionParams['dbname']
+        );
+
+        return $result;
+    }
+
     /**
      * @return Logger
      */
@@ -57,6 +71,7 @@ class DumpTable
 
     /**
      * @param EntityManager $entityManager
+     *
      * @return self
      */
     public function setEntityManager($entityManager)
@@ -70,9 +85,19 @@ class DumpTable
     {
         $tableName = $this->getEntityManager()->getClassMetadata($entityName)->getTableName();
         $result = [];
+        $result = array_merge($result, [$this->createDump($tableName)]);
         $result = array_merge($result, [$this->dumpTable($tableName)]);
         $result = array_merge($result, $this->clearExtTranslations($entityName));
         $result = array_merge($result, [$this->dumpExtTranslations($entityName)]);
+
+        return $result;
+    }
+
+    protected function createDump($tableName)
+    {
+        $cmd = $this->makeCreateDumpCommand();
+        $cmd .= '  '.$tableName;
+        $result = $this->mustRun($cmd);
 
         return $result;
     }
@@ -88,6 +113,7 @@ class DumpTable
 
     /**
      * @param $entityName
+     *
      * @return array
      */
     protected function clearExtTranslations($entityName)
@@ -138,17 +164,18 @@ SQL;
             ->getTableName();
         $connection = $entityManager->getConnection();
 
-        $cmd = sprintf(
-            $this->makeBeginDumpCommand(
-            ).' --tables %s --where="object_class = %s" --extended-insert --lock-tables --quick --skip-add-drop-table --no-create-info',
+        $cmd = $this->makeBeginDumpCommand();
+        $cmd .= ' --extended-insert --lock-tables --quick --skip-add-drop-table --no-create-info';
+        $cmd .= sprintf(
+            ' --tables %s --where="object_class = %s"',
             $extTranslationTableName,
             $connection->quote(addslashes($className))
         );
 
         $insert = $this->mustRun($cmd);
         $result = preg_replace(
-            '/VALUES \((\d+,)/',
-            '(`locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (',
+            '/\(\d+,/',
+            '(NULL,',
             $insert
         );
 

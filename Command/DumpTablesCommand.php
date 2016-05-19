@@ -4,8 +4,8 @@ namespace Octava\Bundle\BranchingBundle\Command;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use Monolog\Handler\NullHandler;
-use Monolog\Processor\MemoryPeakUsageProcessor;
 use Monolog\Handler\StreamHandler;
+use Monolog\Processor\MemoryPeakUsageProcessor;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -29,8 +29,9 @@ class DumpTablesCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param InputInterface $input
+     * @param InputInterface         $input
      * @param OutputInterface|Output $output
+     *
      * @return int|null|void
      */
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -46,7 +47,7 @@ class DumpTablesCommand extends ContainerAwareCommand
 
         $dir = $input->getOption('dir');
         if (!$dir) {
-            $dir = $this->getContainer()->getParameter('kernel.logs_dir') . '/OctavaBranchingBundle';
+            $dir = $this->getContainer()->getParameter('kernel.logs_dir').'/OctavaBranchingBundle';
         }
         if (!file_exists($dir)) {
             mkdir($dir);
@@ -66,6 +67,7 @@ class DumpTablesCommand extends ContainerAwareCommand
 
         if (empty($entities)) {
             $logger->debug('Empty entities list, you could define list in config.yml');
+
             return;
         }
 
@@ -89,11 +91,25 @@ class DumpTablesCommand extends ContainerAwareCommand
             $filename = sprintf('%s/%s.sql', $dir, $tableName);
             file_put_contents($filename, '');
             file_put_contents($filename, implode("\n", $dump), FILE_APPEND);
-            $logger->debug(sprintf('"%s" table dumped to file "%s"', $tableName, $filename));
+
+            $gzFilename = $this->gzCompressFile($filename);
+            if ($gzFilename) {
+                unlink($filename);
+                $logger->debug(sprintf('"%s" table dumped to file "%s"', $tableName, $gzFilename));
+            } else {
+                $logger->debug(sprintf('"%s" table dumped to file "%s"', $tableName, $filename));
+            }
 
             file_put_contents($allFilename, implode("\n", $dump), FILE_APPEND);
         }
-        $logger->debug(sprintf('All entities dump in file "%s"', $allFilename));
+
+        $gzAllFilename = $this->gzCompressFile($allFilename);
+        if ($gzAllFilename) {
+            unlink($allFilename);
+            $logger->debug(sprintf('All entities dump in file "%s"', $gzAllFilename));
+        } else {
+            $logger->debug(sprintf('All entities dump in file "%s"', $allFilename));
+        }
     }
 
     protected function findTables()
@@ -105,6 +121,32 @@ class DumpTablesCommand extends ContainerAwareCommand
         foreach ($list as $item) {
             $tables[] = $item->getName();
         }
+
         return $tables;
+    }
+
+    protected function gzCompressFile($source, $level = 9)
+    {
+        $dest = $source.'.gz';
+        $mode = 'wb'.$level;
+        $error = false;
+        if ($fp_out = gzopen($dest, $mode)) {
+            if ($fp_in = fopen($source, 'rb')) {
+                while (!feof($fp_in)) {
+                    gzwrite($fp_out, fread($fp_in, 1024 * 512));
+                }
+                fclose($fp_in);
+            } else {
+                $error = true;
+            }
+            gzclose($fp_out);
+        } else {
+            $error = true;
+        }
+        if ($error) {
+            return false;
+        } else {
+            return $dest;
+        }
     }
 }
