@@ -12,47 +12,47 @@ parameters:
 
 services:
     octava_branching.helper.database:
-        class: %octava_branching.helper.database.class%
+        class: '%octava_branching.helper.database.class%'
         arguments:
-            - %kernel.root_dir%
-            - %octava_branching.copy_db_data%
-            - %database_driver%
-            - %database_host%
-            - %database_port%
-            - %database_user%
-            - %database_password%
-            - %database_name%
-            - %database_name_original%
+            - '%kernel.root_dir%'
+            - '%octava_branching.copy_db_data%'
+            - '%database_driver%'
+            - '%database_host%'
+            - '%database_port%'
+            - '%database_user%'
+            - '%database_password%'
+            - '%database_name%'
+            - '%database_name_original%'
 
     octava_branching.twig.branching_extension:
-        class: %octava_branching.twig.branching_extension.class%
+        class: '%octava_branching.twig.branching_extension.class%'
         public: false
-        arguments: [%kernel.root_dir%, %kernel.environment%]
+        arguments: ['%kernel.root_dir%', '%kernel.environment%']
         tags:
             - { name: twig.extension }
 
     octava_branching.service.dump_table.logger.file_handler:
-        class: %octava_branching.service.dump_table.logger.file_handler.class%
-        arguments: [%kernel.logs_dir%/OctavaBranchingBundle/dump_table/dump_table.log, 200]
+        class: '%octava_branching.service.dump_table.logger.file_handler.class%'
+        arguments: ['%kernel.logs_dir%/OctavaBranchingBundle/dump_table/dump_table.log', 200]
 
     octava_branching.service.dump_table.logger.memory_processor:
-        class: %octava_branching.service.dump_table.logger.memory_processor.class%
+        class: '%octava_branching.service.dump_table.logger.memory_processor.class%'
 
     octava_branching.service.dump_table.logger:
-        class: %octava_branching.service.dump_table.logger.class%
+        class: '%octava_branching.service.dump_table.logger.class%'
         arguments:
             - 'r12n_project.sync'
-            - [@octava_branching.service.dump_table.logger.file_handler]
-            - [@octava_branching.service.dump_table.logger.memory_processor]
+            - ['@octava_branching.service.dump_table.logger.file_handler']
+            - ['@octava_branching.service.dump_table.logger.memory_processor']
 
     octava.branching.config.alter_increment_config:
-        class: %octava.branching.config.alter_increment_config.class%
+        class: '%octava.branching.config.alter_increment_config.class%'
 
     octava_branching.config.dump_tables_config:
-       class: %octava_branching.config.dump_tables_config.class%
+       class: '%octava_branching.config.dump_tables_config.class%'
 
     octava_branching.service.dump_table:
         class: %octava_branching.service.dump_table.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @octava_branching.service.dump_table.logger
+            - '@doctrine.orm.entity_manager'
+            - '@octava_branching.service.dump_table.logger'

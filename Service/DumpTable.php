@@ -35,6 +35,7 @@ class DumpTable
             $connectionParams['password'],
             $connectionParams['dbname']
         );
+
         return $result;
     }
 
@@ -61,6 +62,7 @@ class DumpTable
     public function setEntityManager($entityManager)
     {
         $this->entityManager = $entityManager;
+
         return $this;
     }
 
@@ -71,16 +73,17 @@ class DumpTable
         $result = array_merge($result, [$this->dumpTable($tableName)]);
         $result = array_merge($result, $this->clearExtTranslations($entityName));
         $result = array_merge($result, [$this->dumpExtTranslations($entityName)]);
+
         return $result;
     }
 
     protected function dumpTable($tableName)
     {
         $cmd = $this->makeBeginDumpCommand();
-        $cmd .= ' ' . $tableName;
-        $process = new Process($cmd);
-        $process->mustRun();
-        return $process->getOutput();
+        $cmd .= '  --extended-insert --lock-tables --quick '.$tableName;
+        $result = $this->mustRun($cmd);
+
+        return $result;
     }
 
     /**
@@ -122,6 +125,7 @@ SQL;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 SQL;
+
         return $delete;
     }
 
@@ -135,14 +139,28 @@ SQL;
         $connection = $entityManager->getConnection();
 
         $cmd = sprintf(
-            $this->makeBeginDumpCommand() . ' --tables %s --where="object_class = %s" --skip-extended-insert --skip-add-drop-table --no-create-info',
+            $this->makeBeginDumpCommand(
+            ).' --tables %s --where="object_class = %s" --extended-insert --lock-tables --quick --skip-add-drop-table --no-create-info',
             $extTranslationTableName,
             $connection->quote(addslashes($className))
         );
+
+        $insert = $this->mustRun($cmd);
+        $result = preg_replace(
+            '/VALUES \((\d+,)/',
+            '(`locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (',
+            $insert
+        );
+
+        return $result;
+    }
+
+    protected function mustRun($cmd)
+    {
+        $this->getLogger()->debug('Process', ['cmd' => $cmd]);
         $process = new Process($cmd);
         $process->mustRun();
-        $insert = $process->getOutput();
-        $result = preg_replace('/VALUES \((\d+,)/', '(`locale`, `object_class`, `field`, `foreign_key`, `content`) VALUES (', $insert);
-        return $result;
+
+        return $process->getOutput();
     }
 }
