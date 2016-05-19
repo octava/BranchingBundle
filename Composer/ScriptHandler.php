@@ -1,7 +1,7 @@
 <?php
 namespace Octava\Bundle\BranchingBundle\Composer;
 
-use Composer\Script\CommandEvent;
+use Composer\Script\Event;
 use Symfony\Component\Yaml\Dumper;
 
 class ScriptHandler
@@ -16,7 +16,7 @@ class ScriptHandler
         'file-name' => 'parameters_ext.yml'
     ];
 
-    public static function buildParameters(CommandEvent $event)
+    public static function buildParameters(Event $event)
     {
         $options = static::getOptions($event);
         $rootDir = getcwd();
@@ -42,7 +42,7 @@ class ScriptHandler
         $event->getIO()->write("<info>Generated config parameters ($filename)</info>");
     }
 
-    protected static function getOptions(CommandEvent $event)
+    protected static function getOptions(Event $event)
     {
         $options = array_merge(static::$options, $event->getComposer()->getPackage()->getExtra());
 

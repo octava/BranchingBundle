@@ -28,7 +28,7 @@ class DumpTable
     public function makeBeginDumpCommand()
     {
         $connectionParams = $this->getEntityManager()->getConnection()->getParams();
-        $result = MySqlDump::makeDumpCommand(
+        $result = MySqlDump::makeDataDumpCommand(
             $connectionParams['host'],
             $connectionParams['port'],
             $connectionParams['user'],

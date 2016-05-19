@@ -8,6 +8,10 @@ use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 
+/**
+ * Class Database
+ * @package Octava\Bundle\BranchingBundle\Helper
+ */
 class Database
 {
     /**
@@ -62,6 +66,18 @@ class Database
      */
     protected $logger;
 
+    /**
+     * Database constructor.
+     * @param $rootDir
+     * @param $copyDbData
+     * @param $driver
+     * @param $host
+     * @param $port
+     * @param $user
+     * @param $password
+     * @param $dbName
+     * @param $dbNameOriginal
+     */
     public function __construct(
         $rootDir,
         $copyDbData,
@@ -92,6 +108,7 @@ class Database
         if (!$this->logger) {
             $this->logger = new Logger(__CLASS__, [new NullHandler()]);
         }
+
         return $this->logger;
     }
 
@@ -102,6 +119,7 @@ class Database
     public function setLogger($logger)
     {
         $this->logger = $logger;
+
         return $this;
     }
 
@@ -177,27 +195,42 @@ class Database
         return $this->dbName;
     }
 
+    /**
+     * @return string
+     */
     public function generateDatabaseName()
     {
         $branchRef = Git::getCurrentBranch($this->getRootDir());
 
         $result = $this->getDbName();
         $branchName = $this->prepareBranchName($branchRef);
-        if ('master' != $branchName) {
-            $result = $result . '_branch_' . $branchName;
+        if (0 !== strpos(strrev($result), strrev($branchName))
+            && 'master' != $branchName
+        ) {
+            $result = $result.'_branch_'.$branchName;
         }
+
         return $result;
     }
 
+    /**
+     * @param $name
+     * @return bool
+     */
     public function databaseExists($name)
     {
         if (in_array($name, $this->getTmpConnection()->getSchemaManager()->listDatabases())) {
             return true;
         }
+
         return false;
     }
 
-    public function generateDatabase($dstDbName)
+    /**
+     * @param string $dstDbName
+     * @param array  $ignoreTables
+     */
+    public function generateDatabase($dstDbName, array $ignoreTables = [])
     {
         $connection = $this->getTmpConnection();
         $connection->getSchemaManager()->createDatabase($dstDbName);
@@ -208,43 +241,37 @@ class Database
             $user = $this->getUser();
             $password = $this->getPassword();
             $srcDbName = $this->getDbName();
+            $mysql = $this->makeMysqlCommand($dstDbName, $host, $port, $user, $password);
 
-            $cmd = MySqlDump::makeDumpCommand(
+            $cmd = MySqlDump::makeCreateDumpCommand(
                 $host,
                 $port,
                 $user,
                 $password,
                 $srcDbName
             );
-            $builder = new ProcessBuilder();
-            $builder->setPrefix('mysql');
-            if ($host) {
-                $builder->add("--host=$host");
-            }
-            if ($port) {
-                $builder->add("--port=$port");
-            }
-            if ($user) {
-                $builder->add("--user=$user");
-            }
-            if ($password) {
-                $builder->add("--password=$password");
-            }
-            $builder->add($dstDbName);
+            $cmd = $cmd." | ".$mysql;
+            $this->runCmd($cmd);
 
-            $cmd = $cmd . " | " . $builder->getProcess()->getCommandLine();
-
-            $process = new Process(
-                $cmd,
-                null,
-                null,
-                null,
-                60 * 15
+            $cmd = MySqlDump::makeDataDumpCommand(
+                $host,
+                $port,
+                $user,
+                $password,
+                $srcDbName,
+                $ignoreTables
             );
-            $process->mustRun();
+            $mysql = $this->makeMysqlCommand($dstDbName, $host, $port, $user, $password);
+            $cmd = $cmd." | ".$mysql;
+
+            $this->runCmd($cmd);
         }
     }
 
+    /**
+     * @param $branchName
+     * @return mixed
+     */
     protected function prepareBranchName($branchName)
     {
         $result = str_replace('-', '_', strtolower($branchName));
@@ -252,9 +279,14 @@ class Database
         if (false !== $pos) {
             $result = substr($result, $pos + 1);
         }
+
         return $result;
     }
 
+    /**
+     * @return \Doctrine\DBAL\Connection
+     * @throws \Doctrine\DBAL\DBALException
+     */
     protected function getTmpConnection()
     {
         if (!$this->tmpConnection) {
@@ -268,6 +300,51 @@ class Database
             ];
             $this->tmpConnection = DriverManager::getConnection($params);
         }
+
         return $this->tmpConnection;
+    }
+
+    /**
+     * @param $dstDbName
+     * @param $host
+     * @param $port
+     * @param $user
+     * @param $password
+     * @return string
+     */
+    protected function makeMysqlCommand($dstDbName, $host, $port, $user, $password)
+    {
+        $builder = new ProcessBuilder();
+        $builder->setPrefix('mysql');
+        if ($host) {
+            $builder->add("--host=$host");
+        }
+        if ($port) {
+            $builder->add("--port=$port");
+        }
+        if ($user) {
+            $builder->add("--user=$user");
+        }
+        if ($password) {
+            $builder->add("--password=$password");
+        }
+        $builder->add("--database=$dstDbName");
+
+        return $builder->getProcess()->getCommandLine();
+    }
+
+    /**
+     * @param $cmd
+     */
+    protected function runCmd($cmd)
+    {
+        $process = new Process(
+            $cmd,
+            null,
+            null,
+            null,
+            null
+        );
+        $process->mustRun();
     }
 }

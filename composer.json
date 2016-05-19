@@ -14,14 +14,14 @@
         "php": ">=5.4"
     },
     "suggest": {
-        "doctrine/doctrine-bundle": "^1.5",
-        "symfony/dependency-injection": "^2.7",
-        "symfony/process": "^2.7",
-        "symfony/yaml": "^2.7"
+        "doctrine/doctrine-bundle": "^1.6",
+        "symfony/dependency-injection": "^3.0",
+        "symfony/process": "^3.0",
+        "symfony/yaml": "^3.0"
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.7.x-dev"
+            "dev-master": "3.0.x-dev"
         }
     },
     "autoload": {
