@@ -6,9 +6,27 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
+/**
+ * Class DropOldDbCommand
+ * @package Octava\Bundle\BranchingBundle\Command
+ */
 class DropOldDbCommand extends ContainerAwareCommand
 {
+    /**
+     * @var SymfonyStyle
+     */
+    protected $symfonyStyle;
+
+    /**
+     * @return SymfonyStyle
+     */
+    public function getSymfonyStyle()
+    {
+        return $this->symfonyStyle;
+    }
+
     protected function configure()
     {
         $this->setName('octava:branching:drop-old')
@@ -20,15 +38,21 @@ class DropOldDbCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('<info>Run command drop old</info>');
-        $output->writeln(sprintf('<info>Force mode: %d</info>', $input->getOption('force')));
-        $output->writeln(sprintf('<info>Test mode: %d</info>', $input->getOption('test')));
+        $this->symfonyStyle = new SymfonyStyle($input, $output);
+
+        $this->getSymfonyStyle()->title('Run command drop old');
+        $this->getSymfonyStyle()->text(
+            [
+                sprintf('Force mode: %d', $input->getOption('force')),
+                sprintf('Test mode: %d', $input->getOption('test')),
+            ]
+        );
 
         $branch = $this->convertBranchToDatabaseName($input->getOption('branch'));
         $branches = [];
         if (!$branch) {
             $branches = $this->getPreparedBranchNames();
-            $output->writeln(sprintf('<info>Exists branches: %s</info>', implode(', ', $branches)));
+            $this->getSymfonyStyle()->writeln(sprintf('Exists branches: %s', implode(', ', $branches)));
         } else {
             if ('master' === strtolower($branch)) {
                 throw new \InvalidArgumentException('Master is cannot be deleted');
@@ -36,15 +60,15 @@ class DropOldDbCommand extends ContainerAwareCommand
         }
 
         $databases = $this->getProjectDatabases();
-        $output->writeln(sprintf('<info>Databases: %s</info>', implode(', ', $databases)));
+        $this->getSymfonyStyle()->writeln(sprintf('Databases: %s', implode(', ', $databases)));
 
         foreach ($databases as $database) {
             preg_match('|_branch_(.+)$|ius', $database, $matches);
             if (isset($matches[1])) {
                 if ($branch && $matches[1] === $branch) {
-                    $this->dropDatabaseByName($database, $input, $output);
+                    $this->dropDatabaseByName($database, $input);
                 } elseif (!$branch && !in_array($matches[1], $branches, true)) {
-                    $this->dropDatabaseByName($database, $input, $output);
+                    $this->dropDatabaseByName($database, $input);
                 }
             }
         }
@@ -111,20 +135,15 @@ class DropOldDbCommand extends ContainerAwareCommand
 
     /**
      * Drop database by name
-     * @param string $name
-     * @param \Symfony\Component\Console\Input\InputInterface $input
-     * @param OutputInterface $output
+     * @param string         $name
+     * @param InputInterface $input
      */
-    protected function dropDatabaseByName($name, InputInterface $input, OutputInterface $output)
+    protected function dropDatabaseByName($name, InputInterface $input)
     {
         $confirmation = $input->getOption('force');
         if (!$input->getOption('force')) {
-            /** @var \Symfony\Component\Console\Helper\DialogHelper $dialog */
-            $dialog = $this->getHelperSet()->get('dialog');
-            $confirmation = $dialog->askConfirmation(
-                $output,
-                sprintf('Found database without related branch <info>%s</info>. Drop it? [Y/n]:', $name),
-                false
+            $confirmation = $this->getSymfonyStyle()->confirm(
+                sprintf('Found database without related branch <info>%s</info>. Drop it? [Y/n]:', $name)
             );
         }
 
@@ -135,12 +154,14 @@ class DropOldDbCommand extends ContainerAwareCommand
                 if (!$input->getOption('test')) {
                     $connection->getSchemaManager()->dropDatabase($name);
                 }
-                $output->writeln(sprintf('<info>Dropped database named <comment>%s</comment></info>', $name));
-            } catch (\Exception $e) {
-                $output->writeln(
-                    sprintf('<error>Could not drop database for connection named <comment>%s</comment></error>', $name)
+                $this->getSymfonyStyle()->success(
+                    sprintf('Dropped database named "%s"', $name)
                 );
-                $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
+            } catch (\Exception $e) {
+                $this->getSymfonyStyle()->error(
+                    sprintf('Could not drop database for connection named "%s"', $name)
+                );
+                $this->getSymfonyStyle()->error($e->getMessage());
             }
         }
     }

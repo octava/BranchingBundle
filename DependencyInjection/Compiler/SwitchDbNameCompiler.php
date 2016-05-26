@@ -16,8 +16,16 @@ class SwitchDbNameCompiler implements CompilerPassInterface
         $originalDbName = $container->getParameter('database_name');
         $container->setParameter('database_name_original', $originalDbName);
 
+        if ($container->hasParameter('database_driver')) {
+            $databaseDriver = $container->getParameter('database_driver');
+        } else {
+            $definition = $container->getDefinition('doctrine.dbal.default_connection');
+            $databaseDriver = $definition->getArgument(0)['driver'];
+            $container->setParameter('database_driver', $databaseDriver);
+        }
+
         if (!$container->getParameter('octava_branching.switch_db')
-            || false === strpos($container->getParameter('database_driver'), 'mysql')
+            || false === strpos($databaseDriver, 'mysql')
             || false === in_array($container->getParameter('kernel.environment'), ['dev', 'test'])
         ) {
             return;
