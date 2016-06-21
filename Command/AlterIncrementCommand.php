@@ -21,7 +21,7 @@ class AlterIncrementCommand extends ContainerAwareCommand
         $env = $this->getContainer()->get('kernel')->getEnvironment();
         $entityManager = $this->getContainer()->get('doctrine')->getManager();
 
-        $map = $this->getContainer()->get('octava.branching.config.alter_increment_config')->getMap();
+        $map = $this->getContainer()->get('octava.branching.config.alter_increment')->getMap();
         foreach ($map as $className => $item) {
             $repository = $entityManager->getRepository($className);
             $tableName = $entityManager->getClassMetadata($className)->getTableName();

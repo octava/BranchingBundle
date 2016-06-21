@@ -19,7 +19,6 @@ class MySqlDump
     {
         $builder = self::createDumpBuilder($host, $port, $user, $password, $dbName);
         $builder->add('--no-create-info');
-        $builder->add('--lock-tables');
         $builder->add('--extended-insert');
         $builder->add('--quick');
 

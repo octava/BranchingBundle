@@ -58,6 +58,15 @@ class Configuration implements ConfigurationInterface
                 ->end()
             ->end();
 
+        $rootNode
+            ->children()
+                ->arrayNode('ignore_tables')
+                    ->defaultValue([])
+                    ->prototype('scalar')
+                    ->end()
+                ->end()
+            ->end();
+
         return $treeBuilder;
     }
 }

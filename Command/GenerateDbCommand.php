@@ -43,11 +43,20 @@ class GenerateDbCommand extends ContainerAwareCommand
         } else {
             $branchDbName = $helper->generateDatabaseName();
         }
+        $ignoreTables = $this->getContainer()
+            ->get('octava_branching.config.ignore_tables')
+            ->getIgnoreTables();
+        if (!empty($input->getOption('ignore-table-data'))) {
+            $ignoreTables = $input->getOption('ignore-table-data');
+        }
 
-        $logger->debug('Run command', ['command' => $this->getName(), 'db_name' => $branchDbName]);
+        $logger->debug(
+            'Run command',
+            ['command' => $this->getName(), 'db_name' => $branchDbName, 'ignore_tables' => $ignoreTables]
+        );
 
         if (!$helper->databaseExists($branchDbName)) {
-            $helper->generateDatabase($branchDbName, array_map('trim', $input->getOption('ignore-table-data')));
+            $helper->generateDatabase($branchDbName, array_map('trim', $ignoreTables));
 
             $logger->debug('Database created successfully');
         } else {

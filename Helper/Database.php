@@ -3,13 +3,13 @@ namespace Octava\Bundle\BranchingBundle\Helper;
 
 use Doctrine\DBAL\DriverManager;
 use Monolog\Handler\NullHandler;
-use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 
 /**
  * Class Database
+ *
  * @package Octava\Bundle\BranchingBundle\Helper
  */
 class Database
@@ -62,12 +62,13 @@ class Database
     protected $dbNameOriginal;
 
     /**
-     * @var LoggerInterface
+     * @var Logger
      */
     protected $logger;
 
     /**
      * Database constructor.
+     *
      * @param $rootDir
      * @param $copyDbData
      * @param $driver
@@ -90,7 +91,7 @@ class Database
         $dbNameOriginal
     ) {
         $this->rootDir = $rootDir;
-        $this->copyDbData = (bool)$copyDbData;
+        $this->copyDbData = (bool) $copyDbData;
         $this->driver = $driver;
         $this->host = $host;
         $this->port = $port;
@@ -101,7 +102,7 @@ class Database
     }
 
     /**
-     * @return LoggerInterface
+     * @return Logger
      */
     public function getLogger()
     {
@@ -113,7 +114,8 @@ class Database
     }
 
     /**
-     * @param LoggerInterface $logger
+     * @param Logger $logger
+     *
      * @return self
      */
     public function setLogger($logger)
@@ -215,6 +217,7 @@ class Database
 
     /**
      * @param $name
+     *
      * @return bool
      */
     public function databaseExists($name)
@@ -270,6 +273,7 @@ class Database
 
     /**
      * @param $branchName
+     *
      * @return mixed
      */
     protected function prepareBranchName($branchName)
@@ -310,6 +314,7 @@ class Database
      * @param $port
      * @param $user
      * @param $password
+     *
      * @return string
      */
     protected function makeMysqlCommand($dstDbName, $host, $port, $user, $password)
@@ -338,6 +343,7 @@ class Database
      */
     protected function runCmd($cmd)
     {
+        $this->getLogger()->debug('Command', [$cmd]);
         $process = new Process(
             $cmd,
             null,

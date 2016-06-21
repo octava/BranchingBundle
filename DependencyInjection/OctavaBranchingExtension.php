@@ -28,10 +28,13 @@ class OctavaBranchingExtension extends Extension
         $container->setParameter('octava_branching.switch_db', $config['switch_db']);
         $container->setParameter('octava_branching.copy_db_data', $config['copy_db_data']);
 
-        $container->getDefinition('octava_branching.config.dump_tables_config')
-            ->addArgument($config['dump_tables']);
+        $container->getDefinition('octava_branching.config.dump_tables')
+            ->setArguments([$config['dump_tables']]);
 
-        $container->getDefinition('octava.branching.config.alter_increment_config')
-            ->addArgument($config['alter_increment_map']);
+        $container->getDefinition('octava.branching.config.alter_increment')
+            ->setArguments([$config['alter_increment_map']]);
+
+        $container->getDefinition('octava_branching.config.ignore_tables')
+            ->setArguments([$config['ignore_tables']]);
     }
 }

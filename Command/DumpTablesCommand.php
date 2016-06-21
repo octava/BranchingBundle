@@ -58,7 +58,7 @@ class DumpTablesCommand extends ContainerAwareCommand
         $entities = $input->getArgument('entities');
         if (empty($entities)) {
             $entities = $this->getContainer()
-                ->get('octava_branching.config.dump_tables_config')
+                ->get('octava_branching.config.dump_tables')
                 ->getRepositories();
             if (!empty($entities)) {
                 $logger->debug('Load entities from octava config', $entities);
