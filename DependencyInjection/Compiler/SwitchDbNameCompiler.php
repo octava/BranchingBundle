@@ -36,7 +36,10 @@ class SwitchDbNameCompiler implements CompilerPassInterface
 
         if ($originalDbName != $branchDbName) {
             if (!$helper->databaseExists($branchDbName)) {
-                $helper->generateDatabase($branchDbName);
+                $helper->generateDatabase(
+                    $branchDbName,
+                    $container->get('octava_branching.config.ignore_tables')->getIgnoreTables()
+                );
             }
             $container->setParameter('database_name', $branchDbName);
 
