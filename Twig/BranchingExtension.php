@@ -5,7 +5,7 @@ use Octava\Bundle\BranchingBundle\Helper\Git;
 
 class BranchingExtension extends \Twig_Extension
 {
-    const CURRENT_BRANCH = 'current_branch';
+    const CURRENT_BRANCH = 'octava_current_branch';
     /**
      * @var string
      */
