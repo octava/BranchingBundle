@@ -91,7 +91,7 @@ server {
 ```
 #your twig template file
 
-{{ current_branch() }}
+{{ octava_current_branch() }}
 ```
 
 For master branch return `master (dev)` string.
