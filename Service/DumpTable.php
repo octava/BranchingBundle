@@ -174,7 +174,7 @@ SQL;
 
         $insert = $this->mustRun($cmd);
         $result = preg_replace(
-            '/\(\d+,/',
+            '/(?<!rgb)\(\d+,/',
             '(NULL,',
             $insert
         );
