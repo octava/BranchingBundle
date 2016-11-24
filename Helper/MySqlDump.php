@@ -19,7 +19,6 @@ class MySqlDump
     {
         $builder = self::createDumpBuilder($host, $port, $user, $password, $dbName);
         $builder->add('--no-create-info');
-        $builder->add('--extended-insert');
         $builder->add('--quick');
 
         $ignoreTables = array_filter($ignoreTables);

@@ -2,6 +2,7 @@
 namespace Octava\Bundle\BranchingBundle\Service;
 
 use Doctrine\ORM\EntityManager;
+use Gedmo\Translatable\Entity\Translation;
 use Octava\Bundle\BranchingBundle\Helper\MySqlDump;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Monolog\Logger;
@@ -105,7 +106,7 @@ class DumpTable
     protected function dumpTable($tableName)
     {
         $cmd = $this->makeBeginDumpCommand();
-        $cmd .= '  --extended-insert --lock-tables --quick '.$tableName;
+        $cmd .= ' --extended-insert --lock-tables '.$tableName;
         $result = $this->mustRun($cmd);
 
         return $result;
@@ -160,24 +161,70 @@ SQL;
         $entityManager = $this->getEntityManager();
         $className = $entityManager->getClassMetadata($entityName)->getReflectionClass()->getName();
         $extTranslationTableName = $entityManager
-            ->getClassMetadata('Gedmo\Translatable\Entity\Translation')
+            ->getClassMetadata(Translation::class)
             ->getTableName();
         $connection = $entityManager->getConnection();
 
-        $cmd = $this->makeBeginDumpCommand();
-        $cmd .= ' --extended-insert --lock-tables --quick --skip-add-drop-table --no-create-info';
-        $cmd .= sprintf(
-            ' --tables %s --where="object_class = %s"',
-            $extTranslationTableName,
-            $connection->quote(addslashes($className))
-        );
+        $insert[] = <<<SQL
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-        $insert = $this->mustRun($cmd);
-        $result = preg_replace(
-            '/(?<!rgb|rgba|hsl|hsla|rect)\(\d+,/',
-            '(NULL,',
-            $insert
-        );
+--
+-- Dumping data for table `$extTranslationTableName`
+--
+-- WHERE:  object_class = '$className'
+SQL;
+        $qb = $connection->createQueryBuilder()
+            ->select('*')
+            ->from($extTranslationTableName, 't')
+            ->where('t.object_class = :object_class')
+            ->setParameter('object_class', $className);
+
+        $rows = $qb->execute()->fetchAll();
+
+        $insert[] = sprintf('INSERT INTO `%s` VALUES', $extTranslationTableName);
+        $values = [];
+        foreach ($rows as $row) {
+            array_walk(
+                $row,
+                function (&$item, $key) use ($connection) {
+                    if ('id' == $key) {
+                        $item = 'NULL';
+                    } else {
+                        $item = $connection->quote($item);
+                    }
+                }
+            );
+            $values[] = '('.implode(",", $row).')';
+        }
+        $insert[] = implode(','.PHP_EOL, $values).';';
+
+        $insert[] = <<<SQL
+/*!40000 ALTER TABLE `$extTranslationTableName` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+SQL;
+
+        $result = '';
+        if (!empty($rows)) {
+            $result = implode(PHP_EOL, $insert);
+        }
 
         return $result;
     }
