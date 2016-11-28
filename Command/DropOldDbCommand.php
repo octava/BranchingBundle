@@ -80,6 +80,9 @@ class DropOldDbCommand extends ContainerAwareCommand
      */
     protected function getPreparedBranchNames()
     {
+        if (!file_exists('.git')) {
+            throw new \RuntimeException('Dir "'.getcwd().'" is not git repository"');
+        }
         exec('git remote update');
         exec('git fetch -p');
         exec('git branch -a', $branches);
