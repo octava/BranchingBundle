@@ -321,6 +321,7 @@ class Database
     {
         $builder = new ProcessBuilder();
         $builder->setPrefix('mysql');
+        $builder->add('--force');
         if ($host) {
             $builder->add("--host=$host");
         }
