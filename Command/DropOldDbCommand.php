@@ -85,7 +85,7 @@ class DropOldDbCommand extends ContainerAwareCommand
         }
         exec('git remote update');
         exec('git fetch -p');
-        exec('git branch -a', $branches);
+        exec('git ls-remote --heads', $branches);
 
         $result = [];
         foreach ($branches as $branch) {
