@@ -9,6 +9,8 @@ class MySqlDump
     {
         $builder = self::createDumpBuilder($host, $port, $user, $password, $dbName);
         $builder->add('--no-data');
+        $builder->add('--skip-lock-tables');
+        $builder->add('--skip-add-locks');
 
         $result = $builder->getProcess()->getCommandLine();
 
@@ -19,7 +21,9 @@ class MySqlDump
     {
         $builder = self::createDumpBuilder($host, $port, $user, $password, $dbName);
         $builder->add('--no-create-info');
-        $builder->add('--quick');
+        $builder->add('--skip-lock-tables');
+        $builder->add('--skip-add-locks');
+        $builder->add('--extended-insert');
 
         $ignoreTables = array_filter($ignoreTables);
         $ignoreTables = array_unique($ignoreTables);

@@ -1,4 +1,5 @@
 <?php
+
 namespace Octava\Bundle\BranchingBundle\Command;
 
 use Monolog\Handler\StreamHandler;
@@ -56,7 +57,7 @@ class GenerateDbCommand extends ContainerAwareCommand
         );
 
         if (!$helper->databaseExists($branchDbName)) {
-            $helper->generateDatabase($branchDbName, array_map('trim', $ignoreTables));
+            $helper->generateDatabase($helper->getDbNameOriginal(), array_map('trim', $ignoreTables));
 
             $logger->debug('Database created successfully');
         } else {
