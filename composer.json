@@ -11,17 +11,17 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "php": ">=5.4"
+        "php": ">=7.1"
     },
     "suggest": {
         "doctrine/doctrine-bundle": "^1.6",
-        "symfony/dependency-injection": "^3.0",
-        "symfony/process": "^3.0",
-        "symfony/yaml": "^3.0"
+        "symfony/dependency-injection": "^3.0|^4.0",
+        "symfony/process": "^3.0|^4.0",
+        "symfony/yaml": "^3.0|^4.0"
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "3.0.x-dev"
+            "dev-master": "4.0.x-dev"
         }
     },
     "autoload": {
