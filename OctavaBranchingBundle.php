@@ -12,6 +12,6 @@ class OctavaBranchingBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new SwitchDbNameCompiler());
+//        $container->addCompilerPass(new SwitchDbNameCompiler());
     }
 }

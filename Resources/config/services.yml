@@ -1,62 +1,13 @@
-parameters:
-    octava_branching.helper.database.class: Octava\Bundle\BranchingBundle\Helper\Database
-    octava_branching.twig.branching_extension.class: Octava\Bundle\BranchingBundle\Twig\BranchingExtension
-
-    octava_branching.service.dump_table.class: Octava\Bundle\BranchingBundle\Service\DumpTable
-    octava_branching.service.dump_table.logger.class: Symfony\Bridge\Monolog\Logger
-    octava_branching.service.dump_table.logger.file_handler.class: Monolog\Handler\StreamHandler
-    octava_branching.service.dump_table.logger.memory_processor.class: Monolog\Processor\MemoryPeakUsageProcessor
-
-    octava_branching.config.dump_tables.class: Octava\Bundle\BranchingBundle\Config\DumpTablesConfig
-    octava.branching.config.alter_increment.class: Octava\Bundle\BranchingBundle\Config\AlterIncrementConfig
-    octava_branching.config.ignore_tables.class: Octava\Bundle\BranchingBundle\Config\IgnoreTablesConfig
-
 services:
-    octava_branching.helper.database:
-        class: '%octava_branching.helper.database.class%'
-        arguments:
-            - '%kernel.root_dir%'
-            - '%octava_branching.copy_db_data%'
-            - '%database_driver%'
-            - '%database_host%'
-            - '%database_port%'
-            - '%database_user%'
-            - '%database_password%'
-            - '%database_name%'
-            - '%database_name_original%'
-
-    octava_branching.twig.branching_extension:
-        class: '%octava_branching.twig.branching_extension.class%'
+    # default configuration for services in *this* file
+    _defaults:
+        # automatically injects dependencies in your services
+        autowire: true
+        # automatically registers your services as commands, event subscribers, etc.
+        autoconfigure: true
+        # this means you cannot fetch services directly from the container via $container->get()
+        # if you need to do this, you can override this setting on individual services
         public: false
-        arguments: ['%kernel.root_dir%', '%kernel.environment%']
-        tags:
-            - { name: twig.extension }
 
-    octava_branching.service.dump_table.logger.file_handler:
-        class: '%octava_branching.service.dump_table.logger.file_handler.class%'
-        arguments: ['%kernel.logs_dir%/OctavaBranchingBundle/dump_table/dump_table.log', 200]
-
-    octava_branching.service.dump_table.logger.memory_processor:
-        class: '%octava_branching.service.dump_table.logger.memory_processor.class%'
-
-    octava_branching.service.dump_table.logger:
-        class: '%octava_branching.service.dump_table.logger.class%'
-        arguments:
-            - 'r12n_project.sync'
-            - ['@octava_branching.service.dump_table.logger.file_handler']
-            - ['@octava_branching.service.dump_table.logger.memory_processor']
-
-    octava.branching.config.alter_increment:
-        class: '%octava.branching.config.alter_increment.class%'
-
-    octava_branching.config.dump_tables:
-       class: '%octava_branching.config.dump_tables.class%'
-
-    octava_branching.config.ignore_tables:
-       class: '%octava_branching.config.ignore_tables.class%'
-
-    octava_branching.service.dump_table:
-        class: '%octava_branching.service.dump_table.class%'
-        arguments:
-            - '@doctrine.orm.entity_manager'
-            - '@octava_branching.service.dump_table.logger'
+    Octava\Bundle\BranchingBundle\Config\:
+        resource: '../../Config/*'
