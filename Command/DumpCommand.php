@@ -35,7 +35,7 @@ class DumpCommand extends ContainerAwareCommand
             ->addOption(
                 'create-ignore-table-empty',
                 null,
-                InputOption::VALUE_REQUIRED,
+                InputOption::VALUE_NONE,
                 'Create ignore tables with no data'
             )
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Execute commands as a dry run.');

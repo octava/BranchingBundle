@@ -30,11 +30,11 @@ class LoadManager
         }
 
         $cat = new Process(['zcat', $filename]);
-        $cat->getCommandLine();
+        $cat = $cat->getCommandLine();
 
         $mysql = MySql::buildConnectionArgs($connection);
         $mysql = new Process($mysql);
-        $mysql->getCommandLine();
+        $mysql = $mysql->getCommandLine();
 
         $cmd = [
             $cat,
