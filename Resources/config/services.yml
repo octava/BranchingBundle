@@ -11,3 +11,12 @@ services:
 
     Octava\Bundle\BranchingBundle\Config\:
         resource: '../../Config/*'
+
+    Octava\Bundle\BranchingBundle\Manager\:
+        resource: '../../Manager/*'
+        public: true
+
+    Octava\Bundle\BranchingBundle\Twig\BranchingExtension:
+        arguments: ['%kernel.project_dir%', '%kernel.environment%']
+        tags:
+            - { name: twig.extension }

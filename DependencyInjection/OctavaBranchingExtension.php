@@ -2,6 +2,8 @@
 
 namespace Octava\Bundle\BranchingBundle\DependencyInjection;
 
+use Octava\Bundle\BranchingBundle\Config\AlterIncrementConfig;
+use Octava\Bundle\BranchingBundle\Config\SwitchConfig;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -25,7 +27,9 @@ class OctavaBranchingExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
 
-        $container->setParameter(Octava\Bundle\BranchingBundle\Config\SwitchConfig::class, $config['switch_db']);
-        $container->setParameter(Octava\Bundle\BranchingBundle\Config\AlterIncrementConfig::class, $config['alter_increment_map']);
+        $config['switch_db']['project_dir'] = $container->getParameter('kernel.project_dir');
+
+        $container->getDefinition(SwitchConfig::class)->setArguments([$config['switch_db']]);
+        $container->getDefinition(AlterIncrementConfig::class)->setArguments([$config['alter_increment_map']]);
     }
 }

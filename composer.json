@@ -17,6 +17,7 @@
         "doctrine/doctrine-bundle": "^1.6",
         "symfony/dependency-injection": "^3.0|^4.0",
         "symfony/process": "^3.0|^4.0",
+        "symfony/console": "^3.0|^4.0",
         "symfony/yaml": "^3.0|^4.0"
     },
     "extra": {
