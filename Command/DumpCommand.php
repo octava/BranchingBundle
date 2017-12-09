@@ -27,13 +27,13 @@ class DumpCommand extends ContainerAwareCommand
                 'Dump dir. Default: %kernel.logs_dir%/<connection-name>.sql.tgz'
             )
             ->addOption(
-                'ignore-tables',
+                'ignore-table',
                 'i',
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
                 'Ignore table list'
             )
             ->addOption(
-                'create-ignore-tables-empty',
+                'create-ignore-table-empty',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Create ignore tables with no data'
@@ -62,8 +62,8 @@ class DumpCommand extends ContainerAwareCommand
         $this->getContainer()->get(DumpManager::class)
             ->run(
                 $connection,
-                $input->getOption('ignore-tables'),
-                $input->getOption('create-ignore-tables-empty'),
+                $input->getOption('ignore-table'),
+                $input->getOption('create-ignore-table-empty'),
                 $filename,
                 $input->getOption('dry-run')
             );
