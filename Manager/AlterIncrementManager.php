@@ -124,9 +124,10 @@ class AlterIncrementManager
      */
     private function alterTableIncrement(Connection $connection, $tableName, $calculatedId, $dryRun)
     {
-        $query = 'ALTER TABLE ? AUTO_INCREMENT = ?';
+        $query = sprintf('ALTER TABLE `%s` AUTO_INCREMENT = ?', $tableName);
         if (!$dryRun) {
-            $connection->executeUpdate($query, [$tableName, $calculatedId]);
+            $connection->executeUpdate($query, [$calculatedId], [\PDO::PARAM_INT]);
+            $this->logger->info('Increment updated', [$query, $tableName, $calculatedId]);
         } else {
             $this->logger->info('Query skipped', [$query, $tableName, $calculatedId]);
         }
