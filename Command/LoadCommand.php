@@ -31,7 +31,7 @@ class LoadCommand extends ContainerAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $connectionId = sprintf('doctrine.dbal.default_connection', $input->getArgument('connection-name'));
+        $connectionId = sprintf('doctrine.dbal.%s_connection', $input->getArgument('connection-name'));
         if (!$this->getContainer()->has($connectionId)) {
             throw new \RuntimeException(sprintf('Service connection "%s" not found', $connectionId));
         }
