@@ -25,27 +25,44 @@ class DumpManager
     {
         $cmd = [];
 
-        $args = MySqlDump::buildCreateDumpArgs(
-            $connection,
-            null,
-            $createIgnoreTablesEmpty ? [] : $ignoreTables
-        );
-        $create = new Process($args);
-        $create = $create->getCommandLine();
-        $cmd[] = $create;
-        $cmd[] = '|';
-        $cmd[] = sprintf('gzip > "%s";', $filename);
+        if ($createIgnoreTablesEmpty) {
+            $args = MySqlDump::buildCreateDumpArgs(
+                $connection,
+                null,
+                $createIgnoreTablesEmpty ? [] : $ignoreTables
+            );
+            $create = new Process($args);
+            $create = $create->getCommandLine();
+            $cmd[] = $create;
+            $cmd[] = '|';
+            $cmd[] = sprintf('gzip > "%s";', $filename);
 
-        $args = MySqlDump::buildDataDumpArgs(
-            $connection,
-            null,
-            $ignoreTables
-        );
-        $create = new Process($args);
-        $create = $create->getCommandLine();
-        $cmd[] = $create;
-        $cmd[] = '|';
-        $cmd[] = sprintf('gzip >> "%s";', $filename);
+            $args = MySqlDump::buildDataDumpArgs(
+                $connection,
+                null,
+                $ignoreTables
+            );
+            $create = new Process($args);
+            $create = $create->getCommandLine();
+            $cmd[] = $create;
+            $cmd[] = '|';
+            $cmd[] = sprintf('gzip >> "%s";', $filename);
+        } else {
+            $args = MySqlDump::buildDataDumpArgs(
+                $connection,
+                null,
+                $ignoreTables
+            );
+            $key = array_search('--no-create-info', $args);
+            if (false !== $key) {
+                unset($args[$key]);
+            }
+            $create = new Process($args);
+            $create = $create->getCommandLine();
+            $cmd[] = $create;
+            $cmd[] = '|';
+            $cmd[] = sprintf('gzip > "%s";', $filename);
+        }
 
         $cmd = implode(' ', $cmd);
 
