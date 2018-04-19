@@ -68,6 +68,7 @@ class MySqlDump
 
         $result[] = '--skip-lock-tables';
         $result[] = '--skip-add-locks';
+        $result[] = '--routines';
 
         return $result;
     }
