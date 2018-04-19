@@ -11,6 +11,7 @@ class MySqlDump
         $builder->add('--no-data');
         $builder->add('--skip-lock-tables');
         $builder->add('--skip-add-locks');
+        $builder->add('--routines');
 
         $result = $builder->getProcess()->getCommandLine();
 
