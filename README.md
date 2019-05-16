@@ -48,11 +48,11 @@ After that run 'app/console' command, and bundle create and copy new database au
 # Default configuration for "BranchingBundle"
 
 octava_branching:
-    switch_db: true     #enable or disable auto switch db
-    dump_tables:        #list entities for `octava:branching:dump-tables` command
-        - AppFaqBundle:Faq
-        - AppBundle\Entity\Page\Site
-        
+    switch_db:
+        enabled: true #enable or disable auto switch db
+        connection_urls: #List of available connection urls
+            - '%env(DATABASE_URL)%'
+        ignore_tables: []
     alter_increment_map:
         'AppBalanceBundle:Transaction':
             test:
