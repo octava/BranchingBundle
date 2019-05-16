@@ -49,7 +49,6 @@ After that run 'app/console' command, and bundle create and copy new database au
 
 octava_branching:
     switch_db: true     #enable or disable auto switch db
-    copy_db_data: true  #copy db from root db
     dump_tables:        #list entities for `octava:branching:dump-tables` command
         - AppFaqBundle:Faq
         - AppBundle\Entity\Page\Site
