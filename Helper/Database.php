@@ -2,6 +2,8 @@
 
 namespace Octava\Bundle\BranchingBundle\Helper;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\DriverManager;
 use Monolog\Handler\NullHandler;
 use Psr\Log\LoggerInterface;
@@ -289,8 +291,8 @@ class Database
     }
 
     /**
-     * @return \Doctrine\DBAL\Connection
-     * @throws \Doctrine\DBAL\DBALException
+     * @return Connection
+     * @throws DBALException
      */
     protected function getTmpConnection()
     {

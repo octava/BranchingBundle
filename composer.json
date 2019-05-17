@@ -1,6 +1,6 @@
 {
     "name": "octava/branching",
-    "description": "BranchingBundle for symdep. Auto change database depends on еру current git branch.",
+    "description": " Auto change database depends on current git branch.",
     "type": "library",
     "license": "MIT",
     "authors": [
@@ -16,7 +16,8 @@
         "symfony/dependency-injection": "~3.4|~4.0",
         "symfony/process": "~3.4|~4.0",
         "symfony/yaml": "~3.4|~4.0",
-        "symfony/monolog-bundle": "^3.3"
+        "symfony/monolog-bundle": "^3.3",
+        "ext-zlib": "*"
     },
     "extra": {
         "branch-alias": {

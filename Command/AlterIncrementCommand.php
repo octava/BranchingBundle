@@ -2,6 +2,8 @@
 
 namespace Octava\Bundle\BranchingBundle\Command;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\PDOStatement;
 use Octava\Bundle\BranchingBundle\Config\AlterIncrementConfig;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -95,10 +97,10 @@ class AlterIncrementCommand extends Command implements ContainerAwareInterface
 
     protected function getCurrentId($tableName)
     {
-        /** @var \Doctrine\DBAL\Connection $connection */
+        /** @var Connection $connection */
         $connection = $this->getContainer()->get('doctrine')->getConnection();
         $baseName = $connection->getDatabase();
-        /** @var \Doctrine\DBAL\Driver\PDOStatement $statement */
+        /** @var PDOStatement $statement */
         $statement = $connection->query(
             sprintf(
                 'SELECT `AUTO_INCREMENT` as id FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = %s AND TABLE_NAME = %s',

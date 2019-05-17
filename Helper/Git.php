@@ -18,7 +18,7 @@ class Git
 
     public static function getRemoteBranches($dir)
     {
-        $cmd = [sprintf('git fetch && git branch -r', $dir)];
+        $cmd = ['git fetch && git branch -r'];
         $process = new Process($cmd);
         $process->setWorkingDirectory($dir);
         $process->mustRun();
