@@ -2,28 +2,44 @@
 
 namespace Octava\Bundle\BranchingBundle\Command;
 
+use Octava\Bundle\BranchingBundle\Manager\DropManager;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
-class DropCommand extends Command implements ContainerAwareInterface
+class DropCommand extends Command
 {
-    use ContainerAwareTrait;
-
     protected static $defaultName = 'octava:branching:drop';
 
     /**
-     * @return ContainerInterface
+     * @var DropManager
      */
-    protected function getContainer(): ?ContainerInterface
+    protected $dropManager;
+
+    /**
+     * DropCommand constructor.
+     * @param DropManager $dropManager
+     */
+    public function __construct(DropManager $dropManager)
     {
-        return $this->container;
+        $this->dropManager = $dropManager;
+
+        parent::__construct();
     }
 
     protected function configure()
     {
         $this
-            ->setDescription('Drop databases which does not have existing branch');
+            ->setDescription('Drop databases which does not have existing branch')
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Execute commands as a dry run.')
+        ;
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $this
+            ->dropManager
+            ->run($input->getOption('dry-run'));
     }
 }

@@ -18,8 +18,7 @@ class Git
 
     public static function getRemoteBranches($dir)
     {
-        $cmd = ['git fetch && git branch -r'];
-        $process = new Process($cmd);
+        $process = Process::fromShellCommandline('git fetch && git branch -r');
         $process->setWorkingDirectory($dir);
         $process->mustRun();
 
