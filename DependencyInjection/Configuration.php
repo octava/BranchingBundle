@@ -1,4 +1,5 @@
 <?php
+
 namespace Octava\Bundle\BranchingBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
@@ -23,48 +24,48 @@ class Configuration implements ConfigurationInterface
         /** @var ArrayNodeDefinition $rootNode */
         $rootNode
             ->children()
-                ->booleanNode('switch_db')
-                    ->defaultFalse()
-                ->end()
-                ->booleanNode('copy_db_data')
-                    ->defaultFalse()
-                ->end()
-                ->arrayNode('dump_tables')
-                    ->defaultValue([])
-                    ->prototype('scalar')
-                    ->end()
-                ->end()
+            ->booleanNode('switch_db')
+            ->defaultFalse()
+            ->end()
+            ->booleanNode('copy_db_data')
+            ->defaultFalse()
+            ->end()
+            ->arrayNode('dump_tables')
+            ->defaultValue([])
+            ->prototype('scalar')
+            ->end()
+            ->end()
             ->end();
 
         $rootNode
             ->children()
-                ->arrayNode('alter_increment_map')
-                    ->prototype('array')
-                        ->children()
-                            ->arrayNode('test')
-                                ->children()
-                                    ->scalarNode('start')->isRequired()->end()
-                                    ->scalarNode('step')->isRequired()->end()
-                                ->end()
-                            ->end()
-                            ->arrayNode('dev')
-                                ->children()
-                                    ->scalarNode('start')->isRequired()->end()
-                                    ->scalarNode('step')->isRequired()->end()
-                                ->end()
-                            ->end()
-                        ->end()
-                    ->end()
-                ->end()
+            ->arrayNode('alter_increment_map')
+            ->prototype('array')
+            ->children()
+            ->arrayNode('test')
+            ->children()
+            ->scalarNode('start')->isRequired()->end()
+            ->scalarNode('step')->isRequired()->end()
+            ->end()
+            ->end()
+            ->arrayNode('dev')
+            ->children()
+            ->scalarNode('start')->isRequired()->end()
+            ->scalarNode('step')->isRequired()->end()
+            ->end()
+            ->end()
+            ->end()
+            ->end()
+            ->end()
             ->end();
 
         $rootNode
             ->children()
-                ->arrayNode('ignore_tables')
-                    ->defaultValue([])
-                    ->prototype('scalar')
-                    ->end()
-                ->end()
+            ->arrayNode('ignore_tables')
+            ->defaultValue([])
+            ->prototype('scalar')
+            ->end()
+            ->end()
             ->end();
 
         return $treeBuilder;

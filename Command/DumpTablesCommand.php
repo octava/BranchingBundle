@@ -2,13 +2,13 @@
 
 namespace Octava\Bundle\BranchingBundle\Command;
 
-use Deployer\Component\PharUpdate\Console\Command;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Processor\MemoryPeakUsageProcessor;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Octava\Bundle\BranchingBundle\Service\DumpTable;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -21,6 +21,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class DumpTablesCommand extends Command implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
+    protected static $defaultName = 'octava:branching:dump-tables';
 
     /**
      * @return ContainerInterface
@@ -33,7 +34,6 @@ class DumpTablesCommand extends Command implements ContainerAwareInterface
     protected function configure()
     {
         $this
-            ->setName('octava:branching:dump-tables')
             ->addArgument(
                 'entities',
                 InputArgument::IS_ARRAY | InputArgument::OPTIONAL,
@@ -73,7 +73,7 @@ class DumpTablesCommand extends Command implements ContainerAwareInterface
         $entities = $input->getArgument('entities');
         if (empty($entities)) {
             $entities = $this->getContainer()
-                ->get('octava_branching.config.dump_tables')
+                ->get(DumpTable::class)
                 ->getRepositories();
             if (!empty($entities)) {
                 $logger->debug('Load entities from octava config', $entities);

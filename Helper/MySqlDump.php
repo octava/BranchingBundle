@@ -1,72 +1,75 @@
 <?php
+
 namespace Octava\Bundle\BranchingBundle\Helper;
 
-use Symfony\Component\Process\ProcessBuilder;
+use Symfony\Component\Process\Process;
 
 class MySqlDump
 {
     static public function makeCreateDumpCommand($host, $port, $user, $password, $dbName)
     {
-        $builder = self::createDumpBuilder($host, $port, $user, $password, $dbName);
-        $builder->add('--no-data');
-        $builder->add('--skip-lock-tables');
-        $builder->add('--skip-add-locks');
-        $builder->add('--routines');
+        $command = self::buildDumpCommand($host, $port, $user, $password, $dbName);
+        $command[] = '--no-data';
+        $command[] = '--skip-lock-tables';
+        $command[] = '--skip-add-locks';
+        $command[] = '--routines';
 
-        $result = $builder->getProcess()->getCommandLine();
+        $process = new Process($command);
+        $result = $process->getCommandLine();
 
         return $result;
     }
 
     static public function makeDataDumpCommand($host, $port, $user, $password, $dbName, array $ignoreTables = [])
     {
-        $builder = self::createDumpBuilder($host, $port, $user, $password, $dbName);
-        $builder->add('--no-create-info');
-        $builder->add('--skip-lock-tables');
-        $builder->add('--skip-add-locks');
-        $builder->add('--extended-insert');
+        $command = self::buildDumpCommand($host, $port, $user, $password, $dbName);
+        $command[] = '--no-create-info';
+        $command[] = '--skip-lock-tables';
+        $command[] = '--skip-add-locks';
+        $command[] = '--extended-insert';
 
         $ignoreTables = array_filter($ignoreTables);
         $ignoreTables = array_unique($ignoreTables);
         $ignoreTables = array_map('trim', $ignoreTables);
         foreach ($ignoreTables as $rule) {
-            $builder->add(sprintf('--ignore-table=%s.%s', $dbName, $rule));
+            $command[] = sprintf('--ignore-table=%s.%s', $dbName, $rule);
         }
 
-        $result = $builder->getProcess()->getCommandLine();
+        $process = new Process($command);
+        $result = $process->getCommandLine();
 
         return $result;
     }
 
     static public function makeDumpCommand($host, $port, $user, $password, $dbName)
     {
-        $builder = self::createDumpBuilder($host, $port, $user, $password, $dbName);
+        $command = self::buildDumpCommand($host, $port, $user, $password, $dbName);
 
-        $result = $builder->getProcess()->getCommandLine();
+        $process = new Process($command);
+        $result = $process->getCommandLine();
 
         return $result;
     }
 
-    public static function createDumpBuilder($host, $port, $user, $password, $dbName)
+    public static function buildDumpCommand($host, $port, $user, $password, $dbName): array
     {
-        $builder = new ProcessBuilder();
-        $builder->setPrefix('mysqldump');
+        $command = ['mysqldump'];
         if ($host) {
-            $builder->add("--host=$host");
+            $command[] = "--host=$host";
         }
         if ($port) {
-            $builder->add("--port=$port");
+            $command[] = "--port=$port";
         }
         if ($user) {
-            $builder->add("--user=$user");
+            $command[] = "--user=$user";
         }
         if ($password) {
-            $builder->add("--password=$password");
+            $command[] = "--password=$password";
         }
         if ($dbName) {
-            $builder->add($dbName);
+            $command[] = $dbName;
         }
 
-        return $builder;
+        return $command;
     }
 }

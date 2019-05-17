@@ -18,21 +18,13 @@ Then, enable the bundle by adding the following line in the app/AppKernel.php fi
 
 ```php
 <?php
-// app/AppKernel.php
-
+// config/bundles.php
 // ...
-class AppKernel extends Kernel
-{
-    public function registerBundles()
-    {
-        if (in_array($this->getEnvironment(), ['dev', 'test'])) {
-            $bundles[] = new Octava\Bundle\BranchingBundle\OctavaBranchingBundle();
-
-        // ...
-    }
-
-    // ...
-}
+return [
+    //...
+    Octava\Bundle\BranchingBundle\OctavaBranchingBundle::class => ['dev' => true],
+    //...
+];
 ```
 
 Create new branch `git branch feature` or `git checkout -b feature`. 
@@ -48,11 +40,12 @@ After that run 'app/console' command, and bundle create and copy new database au
 # Default configuration for "BranchingBundle"
 
 octava_branching:
-    switch_db:
-        enabled: true #enable or disable auto switch db
-        connection_urls: #List of available connection urls
-            - '%env(DATABASE_URL)%'
-        ignore_tables: []
+    switch_db: true     #enable or disable auto switch db
+    copy_db_data: true  #copy db from root db
+    dump_tables:        #list entities for `octava:branching:dump-tables` command
+        - AppFaqBundle:Faq
+        - AppBundle\Entity\Page\Site
+        
     alter_increment_map:
         'AppBalanceBundle:Transaction':
             test:

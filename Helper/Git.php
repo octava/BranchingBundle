@@ -1,4 +1,5 @@
 <?php
+
 namespace Octava\Bundle\BranchingBundle\Helper;
 
 use Symfony\Component\Process\Process;
@@ -7,8 +8,9 @@ class Git
 {
     public static function getCurrentBranch($dir)
     {
-        $cmd = sprintf('cd "%s" && git rev-parse --abbrev-ref HEAD', $dir);
+        $cmd = ['git', 'rev-parse', '--abbrev-ref', 'HEAD'];
         $process = new Process($cmd);
+        $process->setWorkingDirectory($dir);
         $process->mustRun();
         $result = trim($process->getOutput());
         return $result;
@@ -16,8 +18,9 @@ class Git
 
     public static function getRemoteBranches($dir)
     {
-        $cmd = sprintf('cd "%s" && git fetch && git branch -r', $dir);
+        $cmd = [sprintf('git fetch && git branch -r', $dir)];
         $process = new Process($cmd);
+        $process->setWorkingDirectory($dir);
         $process->mustRun();
 
         $output = explode("\n", $process->getOutput());

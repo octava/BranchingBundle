@@ -1,4 +1,5 @@
 <?php
+
 namespace Octava\Bundle\BranchingBundle\Service;
 
 use Doctrine\ORM\EntityManager;
@@ -97,7 +98,7 @@ class DumpTable
     protected function createDump($tableName)
     {
         $cmd = $this->makeCreateDumpCommand();
-        $cmd .= '  '.$tableName;
+        $cmd .= '  ' . $tableName;
         $result = $this->mustRun($cmd);
 
         return $result;
@@ -106,7 +107,7 @@ class DumpTable
     protected function dumpTable($tableName)
     {
         $cmd = $this->makeBeginDumpCommand();
-        $cmd .= ' --extended-insert --lock-tables '.$tableName;
+        $cmd .= ' --extended-insert --lock-tables ' . $tableName;
         $result = $this->mustRun($cmd);
 
         return $result;
@@ -203,9 +204,9 @@ SQL;
                     }
                 }
             );
-            $values[] = '('.implode(",", $row).')';
+            $values[] = '(' . implode(",", $row) . ')';
         }
-        $insert[] = implode(','.PHP_EOL, $values).';';
+        $insert[] = implode(',' . PHP_EOL, $values) . ';';
 
         $insert[] = <<<SQL
 /*!40000 ALTER TABLE `$extTranslationTableName` ENABLE KEYS */;

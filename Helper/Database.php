@@ -1,11 +1,12 @@
 <?php
+
 namespace Octava\Bundle\BranchingBundle\Helper;
 
 use Doctrine\DBAL\DriverManager;
 use Monolog\Handler\NullHandler;
+use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Monolog\Logger;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Process\ProcessBuilder;
 
 /**
  * Class Database
@@ -62,7 +63,7 @@ class Database
     protected $dbNameOriginal;
 
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
     protected $logger;
 
@@ -91,7 +92,7 @@ class Database
         $dbNameOriginal
     ) {
         $this->rootDir = $rootDir;
-        $this->copyDbData = (bool) $copyDbData;
+        $this->copyDbData = (bool)$copyDbData;
         $this->driver = $driver;
         $this->host = $host;
         $this->port = $port;
@@ -102,7 +103,7 @@ class Database
     }
 
     /**
-     * @return Logger
+     * @return LoggerInterface
      */
     public function getLogger()
     {
@@ -209,7 +210,7 @@ class Database
         if (0 !== strpos(strrev($result), strrev($branchName))
             && 'master' != $branchName
         ) {
-            $result = $result.'_branch_'.$branchName;
+            $result = $result . '_branch_' . $branchName;
         }
 
         return $result;
@@ -231,7 +232,7 @@ class Database
 
     /**
      * @param string $dstDbName
-     * @param array  $ignoreTables
+     * @param array $ignoreTables
      */
     public function generateDatabase($dstDbName, array $ignoreTables = [])
     {
@@ -253,7 +254,7 @@ class Database
                 $password,
                 $srcDbName
             );
-            $cmd = $cmd." | ".$mysql;
+            $cmd = $cmd . " | " . $mysql;
             $this->runCmd($cmd);
 
             $cmd = MySqlDump::makeDataDumpCommand(
@@ -265,7 +266,7 @@ class Database
                 $ignoreTables
             );
             $mysql = $this->makeMysqlCommand($dstDbName, $host, $port, $user, $password);
-            $cmd = $cmd." | ".$mysql;
+            $cmd = $cmd . " | " . $mysql;
 
             $this->runCmd($cmd);
         }
@@ -319,23 +320,26 @@ class Database
      */
     protected function makeMysqlCommand($dstDbName, $host, $port, $user, $password)
     {
-        $builder = new ProcessBuilder();
-        $builder->setPrefix('mysql');
+        $command = ['mysql'];
         if ($host) {
-            $builder->add("--host=$host");
+            $command[] = "--host=$host";
+        }
+        if ($host) {
+            $command[] = "--host=$host";
         }
         if ($port) {
-            $builder->add("--port=$port");
+            $command[] = "--port=$port";
         }
         if ($user) {
-            $builder->add("--user=$user");
+            $command[] = "--user=$user";
         }
         if ($password) {
-            $builder->add("--password=$password");
+            $command[] = "--password=$password";
         }
-        $builder->add("--database=$dstDbName");
+        $command[] = "--database=$dstDbName";
 
-        return $builder->getProcess()->getCommandLine();
+        $process = new Process($command);
+        return $process->getCommandLine();
     }
 
     /**

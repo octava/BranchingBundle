@@ -1,4 +1,5 @@
 <?php
+
 namespace Octava\Bundle\BranchingBundle\Twig;
 
 use Octava\Bundle\BranchingBundle\Helper\Git;
@@ -35,7 +36,7 @@ class BranchingExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            self::CURRENT_BRANCH => new \Twig_SimpleFunction(self::CURRENT_BRANCH, [$this, 'getCurrentBranch'])
+            self::CURRENT_BRANCH => new \Twig_SimpleFunction(self::CURRENT_BRANCH, [$this, 'getCurrentBranch']),
         ];
     }
 

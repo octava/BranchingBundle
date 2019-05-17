@@ -1,4 +1,5 @@
 <?php
+
 namespace Octava\Bundle\BranchingBundle\Composer;
 
 use Composer\Script\Event;
@@ -13,7 +14,7 @@ class ScriptHandler
      */
     protected static $options = [
         'symfony-app-dir' => 'app',
-        'file-name' => 'parameters_ext.yml'
+        'file-name' => 'parameters_ext.yml',
     ];
 
     public static function buildParameters(Event $event)
@@ -28,8 +29,8 @@ class ScriptHandler
 
         $parameters = [
             'parameters' => [
-                'build_time' => $date->getTimestamp()
-            ]
+                'build_time' => $date->getTimestamp(),
+            ],
         ];
         $dumper = new Dumper();
         $yaml = $dumper->dump($parameters, 2);

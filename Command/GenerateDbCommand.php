@@ -2,9 +2,9 @@
 
 namespace Octava\Bundle\BranchingBundle\Command;
 
-use Deployer\Component\PharUpdate\Console\Command;
 use Monolog\Handler\StreamHandler;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Octava\Bundle\BranchingBundle\Helper\Database;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -17,6 +17,8 @@ class GenerateDbCommand extends Command implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
 
+    protected static $defaultName = 'octava:branching:generate-db';
+
     /**
      * @return ContainerInterface
      */
@@ -28,7 +30,6 @@ class GenerateDbCommand extends Command implements ContainerAwareInterface
     protected function configure()
     {
         $this
-            ->setName('octava:branching:generate-db')
             ->addOption(
                 'ignore-table-data',
                 'i',
@@ -46,7 +47,7 @@ class GenerateDbCommand extends Command implements ContainerAwareInterface
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         /** @var \Symfony\Component\Console\Output\ConsoleOutput $output */
-        $helper = $this->getContainer()->get('octava_branching.helper.database');
+        $helper = $this->getContainer()->get(Database::class);
         $logger = $helper->getLogger();
         if ($output->isDebug()) {
             $logger->pushHandler(new StreamHandler(STDOUT));

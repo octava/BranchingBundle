@@ -2,9 +2,8 @@
 
 namespace Octava\Bundle\BranchingBundle\Command;
 
-use Deployer\Component\PharUpdate\Console\Command;
 use Doctrine\DBAL\DriverManager;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -20,7 +19,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class DropOldDbCommand extends Command implements ContainerAwareInterface
 {
     use ContainerAwareTrait;
-
+    protected static $defaultName = 'octava:branching:drop-old';
     /**
      * @var SymfonyStyle
      */
@@ -44,7 +43,7 @@ class DropOldDbCommand extends Command implements ContainerAwareInterface
 
     protected function configure()
     {
-        $this->setName('octava:branching:drop-old')
+        $this
             ->setDescription('Drop databases for non existent branches')
             ->addOption('branch', 'b', InputOption::VALUE_REQUIRED, 'Branch name')
             ->addOption('test', 't', InputOption::VALUE_NONE, 'Test mode')

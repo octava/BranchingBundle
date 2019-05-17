@@ -1,6 +1,8 @@
 <?php
+
 namespace Octava\Bundle\BranchingBundle\DependencyInjection\Compiler;
 
+use Octava\Bundle\BranchingBundle\Helper\Database;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
@@ -31,7 +33,7 @@ class SwitchDbNameCompiler implements CompilerPassInterface
             return;
         }
 
-        $helper = $container->get('octava_branching.helper.database');
+        $helper = $container->get(Database::class);
         $branchDbName = $helper->generateDatabaseName();
 
         if ($originalDbName != $branchDbName) {

@@ -1,4 +1,5 @@
 <?php
+
 namespace Octava\Bundle\BranchingBundle\Tests;
 
 use Octava\Bundle\BranchingBundle\Helper\Git;

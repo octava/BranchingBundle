@@ -2,57 +2,19 @@
 
 namespace Octava\Bundle\BranchingBundle\Command;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Octava\Bundle\BranchingBundle\Config\AlterIncrementConfig;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class AlterIncrementCommand extends Command
+class AlterIncrementCommand extends Command implements ContainerAwareInterface
 {
-    const NAME = 'octava:branching:alter-increment';
+    use ContainerAwareTrait;
 
-    /**
-     * @var string
-     */
-    protected $kernelRoot;
-
-    /**
-     * @var string
-     */
-    protected $environment;
-
-    /**
-     * @var AlterIncrementConfig
-     */
-    protected $alterConfig;
-
-    /**
-     * @var EntityManagerInterface
-     */
-    protected $entityManager;
-
-    /**
-     * AlterIncrementCommand constructor.
-     * @param string $kernelRoot
-     * @param string $environment
-     * @param AlterIncrementConfig $alterConfig
-     * @param EntityManagerInterface $entityManager
-     */
-    public function __construct(
-        string $kernelRoot,
-        string $environment,
-        AlterIncrementConfig $alterConfig,
-        EntityManagerInterface $entityManager
-    ) {
-        $this->kernelRoot = $kernelRoot;
-        $this->environment = $environment;
-        $this->alterConfig = $alterConfig;
-        $this->entityManager = $entityManager;
-
-        parent::__construct(self::NAME);
-    }
+    protected static $defaultName = 'octava:branching:alter-increment';
 
     protected function configure()
     {
@@ -60,15 +22,23 @@ class AlterIncrementCommand extends Command
             ->setDescription('Смещаем автоинкременты в табличках, которые используются для генерации transactionId');
     }
 
+    /**
+     * @return ContainerInterface
+     */
+    protected function getContainer(): ?ContainerInterface
+    {
+        return $this->container;
+    }
+
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $msg = [];
 
         $branchId = $this->getBranchId();
-        $env = $this->environment;
-        $entityManager = $this->entityManager;
+        $env = $this->getContainer()->get('kernel')->getEnvironment();
+        $entityManager = $this->getContainer()->get('doctrine')->getManager();
 
-        $map = $this->alterConfig->getMap();
+        $map = $this->getContainer()->get(AlterIncrementConfig::class)->getMap();
         foreach ($map as $className => $item) {
             $repository = $entityManager->getRepository($className);
             $tableName = $entityManager->getClassMetadata($className)->getTableName();
@@ -83,7 +53,7 @@ class AlterIncrementCommand extends Command
                         $calculatedId
                     );
                 } else {
-                    $connection = $entityManager->getConnection();
+                    $connection = $this->getContainer()->get('doctrine')->getConnection();
                     $schemaManager = $connection->getSchemaManager();
                     if ($schemaManager->tablesExist([$tableName]) === true) {
                         $query = sprintf('ALTER TABLE `%s` AUTO_INCREMENT = %d', $tableName, $calculatedId);
@@ -102,7 +72,7 @@ class AlterIncrementCommand extends Command
 
     protected function getBranchId()
     {
-        $rootPath = $this->kernelRoot;
+        $rootPath = $this->getContainer()->getParameter('kernel.root_dir');
         $cmd = 'cd ' . $rootPath . ' && git symbolic-ref HEAD';
         $branchName = exec($cmd);
 
@@ -126,7 +96,7 @@ class AlterIncrementCommand extends Command
     protected function getCurrentId($tableName)
     {
         /** @var \Doctrine\DBAL\Connection $connection */
-        $connection = $this->entityManager->getConnection();
+        $connection = $this->getContainer()->get('doctrine')->getConnection();
         $baseName = $connection->getDatabase();
         /** @var \Doctrine\DBAL\Driver\PDOStatement $statement */
         $statement = $connection->query(
