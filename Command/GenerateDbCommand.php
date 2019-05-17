@@ -3,6 +3,7 @@
 namespace Octava\Bundle\BranchingBundle\Command;
 
 use Monolog\Handler\StreamHandler;
+use Octava\Bundle\BranchingBundle\Config\IgnoreTablesConfig;
 use Octava\Bundle\BranchingBundle\Helper\Database;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -61,7 +62,7 @@ class GenerateDbCommand extends Command implements ContainerAwareInterface
             $branchDbName = $helper->generateDatabaseName();
         }
         $ignoreTables = $this->getContainer()
-            ->get('octava_branching.config.ignore_tables')
+            ->get(IgnoreTablesConfig::class)
             ->getIgnoreTables();
         if (!empty($input->getOption('ignore-table-data'))) {
             $ignoreTables = $input->getOption('ignore-table-data');

@@ -2,6 +2,7 @@
 
 namespace Octava\Bundle\BranchingBundle\DependencyInjection\Compiler;
 
+use Octava\Bundle\BranchingBundle\Config\IgnoreTablesConfig;
 use Octava\Bundle\BranchingBundle\Helper\Database;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -40,7 +41,7 @@ class SwitchDbNameCompiler implements CompilerPassInterface
             if (!$helper->databaseExists($branchDbName)) {
                 $helper->generateDatabase(
                     $branchDbName,
-                    $container->get('octava_branching.config.ignore_tables')->getIgnoreTables()
+                    $container->get(IgnoreTablesConfig::class)->getIgnoreTables()
                 );
             }
             $container->setParameter('database_name', $branchDbName);

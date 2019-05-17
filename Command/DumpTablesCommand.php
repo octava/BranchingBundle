@@ -51,7 +51,7 @@ class DumpTablesCommand extends Command implements ContainerAwareInterface
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $service = $this->getContainer()->get('octava_branching.service.dump_table');
+        $service = $this->getContainer()->get(DumpTable::class);
         $logger = $service->getLogger();
         if ($output->isDebug()) {
             $logger->pushHandler(new StreamHandler(STDOUT));
