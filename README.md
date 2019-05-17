@@ -42,8 +42,7 @@ Default configuration for "BranchingBundle"
 
 octava_branching:
     switch_db:
-        enabled: false
-        connections:
+        enabled: true
         connection_urls:
             - '%env(resolve:DATABASE_URL)%'
             - '%env(resolve:BACKEND_DATABASE_URL)%'

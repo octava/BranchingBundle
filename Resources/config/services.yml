@@ -9,6 +9,10 @@ services:
         # if you need to do this, you can override this setting on individual services
         public: false
 
+    Octava\Bundle\BranchingBundle\Command\:
+        resource: '../../Command'
+        tags: ['console.command']
+
     Octava\Bundle\BranchingBundle\Config\:
         resource: '../../Config/*'
 
