@@ -19,12 +19,11 @@ Then, enable the bundle by adding the following line in the app/AppKernel.php fi
 ```php
 <?php
 // config/bundles.php
-// ...
 return [
-    //...
-    Octava\Bundle\BranchingBundle\OctavaBranchingBundle::class => ['dev' => true],
-    //...
-];
+    // ...
+    Octava\Bundle\BranchingBundle\OctavaBranchingBundle::class => ['all' => true],
+    // ...
+}
 ```
 
 Create new branch `git branch feature` or `git checkout -b feature`. 
@@ -36,24 +35,41 @@ After that run 'app/console' command, and bundle create and copy new database au
 
 ### Configuration
 
-```
-# Default configuration for "BranchingBundle"
+Default configuration for "BranchingBundle"
+
+```yaml
+# config/packages/octava_branching.yaml
 
 octava_branching:
-    switch_db: true     #enable or disable auto switch db
-    copy_db_data: true  #copy db from root db
-    dump_tables:        #list entities for `octava:branching:dump-tables` command
-        - AppFaqBundle:Faq
-        - AppBundle\Entity\Page\Site
-        
+    switch_db:
+        enabled: false
+        connections:
+        connection_urls:
+            - '%env(resolve:DATABASE_URL)%'
+            - '%env(resolve:BACKEND_DATABASE_URL)%'
+        ignore_tables:
+            - error_log
+            - resend_log
     alter_increment_map:
-        'AppBalanceBundle:Transaction':
-            test:
-                start: 500000000
-                step: 1000
-            dev:
-                start: 8000000
-                step: 1000
+        default:
+            'UserBundle:User':
+                test:
+                    start: 50000000
+                    step: 1000
+                dev:
+                    start: 8000000
+                    step: 1000
+            'BalanceBundle:BalanceOperation': ~
+            'partner': ~
+```
+
+Configuration for dev
+
+```yaml
+#config/packages/dev/octava_branching.yaml
+octava_branching:
+    switch_db:
+        enabled: true
 ```
 
 ### Nginx example

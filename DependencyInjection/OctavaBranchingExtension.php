@@ -3,8 +3,7 @@
 namespace Octava\Bundle\BranchingBundle\DependencyInjection;
 
 use Octava\Bundle\BranchingBundle\Config\AlterIncrementConfig;
-use Octava\Bundle\BranchingBundle\Config\DumpTablesConfig;
-use Octava\Bundle\BranchingBundle\Config\IgnoreTablesConfig;
+use Octava\Bundle\BranchingBundle\Config\SwitchConfig;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
@@ -28,16 +27,9 @@ class OctavaBranchingExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
 
-        $container->setParameter('octava_branching.switch_db', $config['switch_db']);
-        $container->setParameter('octava_branching.copy_db_data', $config['copy_db_data']);
+        $config['switch_db']['project_dir'] = $container->getParameter('kernel.project_dir');
 
-        $container->getDefinition(DumpTablesConfig::class)
-            ->setArguments([$config['dump_tables']]);
-
-        $container->getDefinition(AlterIncrementConfig::class)
-            ->setArguments([$config['alter_increment_map']]);
-
-        $container->getDefinition(IgnoreTablesConfig::class)
-            ->setArguments([$config['ignore_tables']]);
+        $container->getDefinition(SwitchConfig::class)->setArguments([$config['switch_db']]);
+        $container->getDefinition(AlterIncrementConfig::class)->setArguments([$config['alter_increment_map']]);
     }
 }

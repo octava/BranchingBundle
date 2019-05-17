@@ -17,7 +17,8 @@
         "symfony/process": "~3.4|~4.0",
         "symfony/yaml": "~3.4|~4.0",
         "symfony/monolog-bundle": "^3.3",
-        "ext-zlib": "*"
+        "ext-zlib": "*",
+        "ext-pdo": "*"
     },
     "extra": {
         "branch-alias": {

@@ -2,74 +2,87 @@
 
 namespace Octava\Bundle\BranchingBundle\Helper;
 
-use Symfony\Component\Process\Process;
+
+use Doctrine\DBAL\Connection;
 
 class MySqlDump
 {
-    static public function makeCreateDumpCommand($host, $port, $user, $password, $dbName)
+    static public function buildCreateDumpArgs(Connection $connection, $database = null, array $ignoreTables = [])
     {
-        $command = self::buildDumpCommand($host, $port, $user, $password, $dbName);
-        $command[] = '--no-data';
-        $command[] = '--skip-lock-tables';
-        $command[] = '--skip-add-locks';
-        $command[] = '--routines';
+        if (!$database) {
+            $database = $connection->getDatabase();
+        }
 
-        $process = new Process($command);
-        $result = $process->getCommandLine();
+        $args = self::buildConnectionDumpArgs($connection, $database);
+        $args = array_merge(
+            $args,
+            [
+                '--no-data',
+            ]
+        );
+
+        $args = array_merge($args, self::buildIgnoreTablesArgs($database, $ignoreTables));
+
+        return $args;
+    }
+
+    static public function buildDataDumpArgs(Connection $connection, $database = null, array $ignoreTables = [])
+    {
+        if (!$database) {
+            $database = $connection->getDatabase();
+        }
+
+        $args = self::buildConnectionDumpArgs($connection, $database);
+        $args = array_merge(
+            $args,
+            [
+                '--no-create-info',
+                '--extended-insert',
+            ]
+        );
+
+        $args = array_merge($args, self::buildIgnoreTablesArgs($database, $ignoreTables));
+
+        return $args;
+    }
+
+    public static function buildConnectionDumpArgs(Connection $connection, $database)
+    {
+        $result = [
+            'mysqldump'
+        ];
+        if ($host = $connection->getHost()) {
+            $result[] = "--host=$host";
+        }
+        if ($port = $connection->getPort()) {
+            $result[] = "--port=$port";
+        }
+        if ($user = $connection->getUsername()) {
+            $result[] = "--user=$user";
+        }
+        if ($password = $connection->getPassword()) {
+            $result[] = "--password=$password";
+        }
+
+        $result[] = $database;
+
+        $result[] = '--skip-lock-tables';
+        $result[] = '--skip-add-locks';
+        $result[] = '--routines';
 
         return $result;
     }
 
-    static public function makeDataDumpCommand($host, $port, $user, $password, $dbName, array $ignoreTables = [])
+    protected static function buildIgnoreTablesArgs($database, $ignoreTables)
     {
-        $command = self::buildDumpCommand($host, $port, $user, $password, $dbName);
-        $command[] = '--no-create-info';
-        $command[] = '--skip-lock-tables';
-        $command[] = '--skip-add-locks';
-        $command[] = '--extended-insert';
-
+        $args = [];
         $ignoreTables = array_filter($ignoreTables);
         $ignoreTables = array_unique($ignoreTables);
         $ignoreTables = array_map('trim', $ignoreTables);
         foreach ($ignoreTables as $rule) {
-            $command[] = sprintf('--ignore-table=%s.%s', $dbName, $rule);
+            $args[] = sprintf('--ignore-table=%s.%s', $database, $rule);
         }
 
-        $process = new Process($command);
-        $result = $process->getCommandLine();
-
-        return $result;
-    }
-
-    static public function makeDumpCommand($host, $port, $user, $password, $dbName)
-    {
-        $command = self::buildDumpCommand($host, $port, $user, $password, $dbName);
-
-        $process = new Process($command);
-        $result = $process->getCommandLine();
-
-        return $result;
-    }
-
-    public static function buildDumpCommand($host, $port, $user, $password, $dbName): array
-    {
-        $command = ['mysqldump'];
-        if ($host) {
-            $command[] = "--host=$host";
-        }
-        if ($port) {
-            $command[] = "--port=$port";
-        }
-        if ($user) {
-            $command[] = "--user=$user";
-        }
-        if ($password) {
-            $command[] = "--password=$password";
-        }
-        if ($dbName) {
-            $command[] = $dbName;
-        }
-
-        return $command;
+        return $args;
     }
 }

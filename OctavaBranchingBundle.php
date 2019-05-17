@@ -2,7 +2,7 @@
 
 namespace Octava\Bundle\BranchingBundle;
 
-use Octava\Bundle\BranchingBundle\DependencyInjection\Compiler\SwitchDbNameCompiler;
+use Octava\Bundle\BranchingBundle\DependencyInjection\Compiler\UpdateDoctrineConnectionFactoryPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
@@ -12,6 +12,6 @@ class OctavaBranchingBundle extends Bundle
     {
         parent::build($container);
 
-        $container->addCompilerPass(new SwitchDbNameCompiler());
+        $container->addCompilerPass(new UpdateDoctrineConnectionFactoryPass());
     }
 }

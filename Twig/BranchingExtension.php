@@ -10,17 +10,17 @@ class BranchingExtension extends \Twig_Extension
     /**
      * @var string
      */
-    protected $path;
+    protected $projectDir;
 
     /**
      * @var string
      */
-    protected $env;
+    protected $environment;
 
-    public function __construct($kernelRootDir, $env)
+    public function __construct($projectDir, $environment)
     {
-        $this->path = realpath($kernelRootDir . '/../');
-        $this->env = $env;
+        $this->projectDir = $projectDir;
+        $this->environment = $environment;
     }
 
     /**
@@ -36,15 +36,21 @@ class BranchingExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            self::CURRENT_BRANCH => new \Twig_SimpleFunction(self::CURRENT_BRANCH, [$this, 'getCurrentBranch']),
+            self::CURRENT_BRANCH => new \Twig_Function(self::CURRENT_BRANCH, [$this, 'getCurrentBranch'])
         ];
     }
 
     public function getCurrentBranch($prefix = '', $postfix = '')
     {
         $result = null;
-        if (in_array($this->env, ['dev', 'test'])) {
-            $result = sprintf('%s%s (%s)%s', $prefix, Git::getCurrentBranch($this->path), $this->env, $postfix);
+        if (in_array($this->environment, ['dev', 'test'])) {
+            $result = sprintf(
+                '%s%s (%s)%s',
+                $prefix,
+                Git::getCurrentBranch($this->projectDir),
+                $this->environment,
+                $postfix
+            );
         }
         return $result;
     }
