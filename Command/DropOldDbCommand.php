@@ -1,19 +1,26 @@
 <?php
+
 namespace Octava\Bundle\BranchingBundle\Command;
 
+use Deployer\Component\PharUpdate\Console\Command;
 use Doctrine\DBAL\DriverManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class DropOldDbCommand
  * @package Octava\Bundle\BranchingBundle\Command
  */
-class DropOldDbCommand extends ContainerAwareCommand
+class DropOldDbCommand extends Command implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
     /**
      * @var SymfonyStyle
      */
@@ -25,6 +32,14 @@ class DropOldDbCommand extends ContainerAwareCommand
     public function getSymfonyStyle()
     {
         return $this->symfonyStyle;
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    protected function getContainer(): ?ContainerInterface
+    {
+        return $this->container;
     }
 
     protected function configure()
@@ -81,7 +96,7 @@ class DropOldDbCommand extends ContainerAwareCommand
     protected function getPreparedBranchNames()
     {
         if (!file_exists('.git')) {
-            throw new \RuntimeException('Dir "'.getcwd().'" is not git repository"');
+            throw new \RuntimeException('Dir "' . getcwd() . '" is not git repository"');
         }
         exec('git remote update');
         exec('git fetch -p');
@@ -138,7 +153,7 @@ class DropOldDbCommand extends ContainerAwareCommand
 
     /**
      * Drop database by name
-     * @param string         $name
+     * @param string $name
      * @param InputInterface $input
      */
     protected function dropDatabaseByName($name, InputInterface $input)

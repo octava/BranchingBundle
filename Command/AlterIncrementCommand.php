@@ -1,15 +1,62 @@
 <?php
+
 namespace Octava\Bundle\BranchingBundle\Command;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Octava\Bundle\BranchingBundle\Config\AlterIncrementConfig;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class AlterIncrementCommand extends ContainerAwareCommand
+class AlterIncrementCommand extends Command
 {
+    const NAME = 'octava:branching:alter-increment';
+
+    /**
+     * @var string
+     */
+    protected $kernelRoot;
+
+    /**
+     * @var string
+     */
+    protected $environment;
+
+    /**
+     * @var AlterIncrementConfig
+     */
+    protected $alterConfig;
+
+    /**
+     * @var EntityManagerInterface
+     */
+    protected $entityManager;
+
+    /**
+     * AlterIncrementCommand constructor.
+     * @param string $kernelRoot
+     * @param string $environment
+     * @param AlterIncrementConfig $alterConfig
+     * @param EntityManagerInterface $entityManager
+     */
+    public function __construct(
+        string $kernelRoot,
+        string $environment,
+        AlterIncrementConfig $alterConfig,
+        EntityManagerInterface $entityManager
+    ) {
+        $this->kernelRoot = $kernelRoot;
+        $this->environment = $environment;
+        $this->alterConfig = $alterConfig;
+        $this->entityManager = $entityManager;
+
+        parent::__construct(self::NAME);
+    }
+
     protected function configure()
     {
-        $this->setName('octava:branching:alter-increment')
+        $this
             ->setDescription('Смещаем автоинкременты в табличках, которые используются для генерации transactionId');
     }
 
@@ -18,10 +65,10 @@ class AlterIncrementCommand extends ContainerAwareCommand
         $msg = [];
 
         $branchId = $this->getBranchId();
-        $env = $this->getContainer()->get('kernel')->getEnvironment();
-        $entityManager = $this->getContainer()->get('doctrine')->getManager();
+        $env = $this->environment;
+        $entityManager = $this->entityManager;
 
-        $map = $this->getContainer()->get('octava.branching.config.alter_increment')->getMap();
+        $map = $this->alterConfig->getMap();
         foreach ($map as $className => $item) {
             $repository = $entityManager->getRepository($className);
             $tableName = $entityManager->getClassMetadata($className)->getTableName();
@@ -36,7 +83,7 @@ class AlterIncrementCommand extends ContainerAwareCommand
                         $calculatedId
                     );
                 } else {
-                    $connection = $this->getContainer()->get('doctrine')->getConnection();
+                    $connection = $entityManager->getConnection();
                     $schemaManager = $connection->getSchemaManager();
                     if ($schemaManager->tablesExist([$tableName]) === true) {
                         $query = sprintf('ALTER TABLE `%s` AUTO_INCREMENT = %d', $tableName, $calculatedId);
@@ -55,8 +102,8 @@ class AlterIncrementCommand extends ContainerAwareCommand
 
     protected function getBranchId()
     {
-        $rootPath = $this->getContainer()->getParameter('kernel.root_dir');
-        $cmd = 'cd '.$rootPath.' && git symbolic-ref HEAD';
+        $rootPath = $this->kernelRoot;
+        $cmd = 'cd ' . $rootPath . ' && git symbolic-ref HEAD';
         $branchName = exec($cmd);
 
         $pos = strrpos($branchName, '/');
@@ -79,7 +126,7 @@ class AlterIncrementCommand extends ContainerAwareCommand
     protected function getCurrentId($tableName)
     {
         /** @var \Doctrine\DBAL\Connection $connection */
-        $connection = $this->getContainer()->get('doctrine')->getConnection();
+        $connection = $this->entityManager->getConnection();
         $baseName = $connection->getDatabase();
         /** @var \Doctrine\DBAL\Driver\PDOStatement $statement */
         $statement = $connection->query(

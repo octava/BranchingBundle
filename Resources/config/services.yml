@@ -12,6 +12,18 @@ parameters:
     octava_branching.config.ignore_tables.class: Octava\Bundle\BranchingBundle\Config\IgnoreTablesConfig
 
 services:
+    _defaults:
+        public: false
+        autoconfigure: true
+        autowire: true
+        bind:
+            $environment: '%kernel.environment%'
+            $kernelRoot: '%kernel.root_dir%'
+
+    _instanceof:
+        Symfony\Component\Console\Command\Command:
+            tags: ['console.command']
+
     octava_branching.helper.database:
         class: '%octava_branching.helper.database.class%'
         arguments:
@@ -50,10 +62,10 @@ services:
         class: '%octava.branching.config.alter_increment.class%'
 
     octava_branching.config.dump_tables:
-       class: '%octava_branching.config.dump_tables.class%'
+        class: '%octava_branching.config.dump_tables.class%'
 
     octava_branching.config.ignore_tables:
-       class: '%octava_branching.config.ignore_tables.class%'
+        class: '%octava_branching.config.ignore_tables.class%'
 
     octava_branching.service.dump_table:
         class: '%octava_branching.service.dump_table.class%'

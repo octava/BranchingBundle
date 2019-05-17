@@ -1,6 +1,8 @@
 <?php
+
 namespace Octava\Bundle\BranchingBundle\Command;
 
+use Deployer\Component\PharUpdate\Console\Command;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\ORMException;
 use Monolog\Handler\NullHandler;
@@ -12,9 +14,22 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class DumpTablesCommand extends ContainerAwareCommand
+class DumpTablesCommand extends Command implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
+    /**
+     * @return ContainerInterface
+     */
+    protected function getContainer(): ?ContainerInterface
+    {
+        return $this->container;
+    }
+
     protected function configure()
     {
         $this
@@ -29,7 +44,7 @@ class DumpTablesCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param InputInterface         $input
+     * @param InputInterface $input
      * @param OutputInterface|Output $output
      *
      * @return int|null|void
@@ -47,7 +62,7 @@ class DumpTablesCommand extends ContainerAwareCommand
 
         $dir = $input->getOption('dir');
         if (!$dir) {
-            $dir = $this->getContainer()->getParameter('kernel.logs_dir').'/OctavaBranchingBundle';
+            $dir = $this->getContainer()->getParameter('kernel.logs_dir') . '/OctavaBranchingBundle';
         }
         if (!file_exists($dir)) {
             mkdir($dir);
@@ -127,8 +142,8 @@ class DumpTablesCommand extends ContainerAwareCommand
 
     protected function gzCompressFile($source, $level = 9)
     {
-        $dest = $source.'.gz';
-        $mode = 'wb'.$level;
+        $dest = $source . '.gz';
+        $mode = 'wb' . $level;
         $error = false;
         if ($fp_out = gzopen($dest, $mode)) {
             if ($fp_in = fopen($source, 'rb')) {

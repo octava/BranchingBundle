@@ -2,15 +2,29 @@
 
 namespace Octava\Bundle\BranchingBundle\Command;
 
+use Deployer\Component\PharUpdate\Console\Command;
 use Monolog\Handler\StreamHandler;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class GenerateDbCommand extends ContainerAwareCommand
+class GenerateDbCommand extends Command implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+
+    /**
+     * @return ContainerInterface
+     */
+    protected function getContainer(): ?ContainerInterface
+    {
+        return $this->container;
+    }
+
     protected function configure()
     {
         $this
