@@ -43,9 +43,8 @@ class DatabaseManager
                 $branchDbName = $this->generateBranchDatabaseName($originalDbName);
 
                 if ($originalDbName != $branchDbName) {
-                    $check = true;
                     if (!$this->databaseExists($branchDbName, $connection)) {
-                        $check = $this->generateDatabase(
+                        $this->generateDatabase(
                             $connection,
                             $originalDbName,
                             $branchDbName,
