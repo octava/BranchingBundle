@@ -18,6 +18,9 @@ class MySqlDump
             $args,
             [
                 '--no-data',
+                '--routines',
+                '--add-drop-trigger',
+                '--triggers',
             ]
         );
 
@@ -38,6 +41,7 @@ class MySqlDump
             [
                 '--no-create-info',
                 '--extended-insert',
+                '--skip-triggers',
             ]
         );
 
@@ -49,7 +53,7 @@ class MySqlDump
     public static function buildConnectionDumpArgs(Connection $connection, $database)
     {
         $result = [
-            'mysqldump'
+            'mysqldump',
         ];
         if ($host = $connection->getHost()) {
             $result[] = "--host=$host";
@@ -68,7 +72,6 @@ class MySqlDump
 
         $result[] = '--skip-lock-tables';
         $result[] = '--skip-add-locks';
-        $result[] = '--routines';
 
         return $result;
     }

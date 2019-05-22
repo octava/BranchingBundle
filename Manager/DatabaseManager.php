@@ -8,6 +8,7 @@ use Octava\Bundle\BranchingBundle\Config\SwitchConfig;
 use Octava\Bundle\BranchingBundle\Helper\Git;
 use Octava\Bundle\BranchingBundle\Helper\MySql;
 use Octava\Bundle\BranchingBundle\Helper\MySqlDump;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\Process;
 
 class DatabaseManager
@@ -16,10 +17,15 @@ class DatabaseManager
      * @var SwitchConfig
      */
     private $switchConfig;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
-    public function __construct(SwitchConfig $switchConfig)
+    public function __construct(SwitchConfig $switchConfig, LoggerInterface $logger)
     {
         $this->switchConfig = $switchConfig;
+        $this->logger = $logger;
     }
 
     /**
@@ -37,8 +43,9 @@ class DatabaseManager
                 $branchDbName = $this->generateBranchDatabaseName($originalDbName);
 
                 if ($originalDbName != $branchDbName) {
+                    $check = true;
                     if (!$this->databaseExists($branchDbName, $connection)) {
-                        $this->generateDatabase(
+                        $check = $this->generateDatabase(
                             $connection,
                             $originalDbName,
                             $branchDbName,
@@ -146,6 +153,7 @@ class DatabaseManager
             null,
             3600
         );
+        $this->logger->debug('run process', ['cmd' => $process->getCommandLine()]);
         $process->mustRun();
     }
 
@@ -154,15 +162,29 @@ class DatabaseManager
         if (!$this->databaseExists($branchDatabase, $connection)) {
             $connection->getSchemaManager()->createDatabase($branchDatabase);
 
-            $mysql = new Process(MySql::buildConnectionArgs($connection, $branchDatabase));
-            $mysqlCreate = new Process(MySqlDump::buildCreateDumpArgs($connection, $database));
+            try {
+                $mysql = new Process(MySql::buildConnectionArgs($connection, $branchDatabase));
+                $mysqlCreate = new Process(MySqlDump::buildCreateDumpArgs($connection, $database));
 
-            $cmd = $mysqlCreate->getCommandLine() . ' | ' . $mysql->getCommandLine();
-            $this->runCmd($cmd);
+                $cmd = [];
+                $cmd[] = $mysqlCreate->getCommandLine();
+                $cmd[] = 'sed -e \'s/DEFINER[ ]*=[ ]*[^*]*\*/\*/\'';
+                $cmd[] = 'sed -e \'s/DEFINER[ ]*=[ ]*[^*]*PROCEDURE/PROCEDURE/\'';
+                $cmd[] = 'sed -e \'s/DEFINER[ ]*=[ ]*[^*]*FUNCTION/FUNCTION/\'';
+                $cmd[] = 'sed -e \'s/`' . $database . '`\./`' . $branchDatabase . '`\./\'';
 
-            $mysqlData = new Process(MySqlDump::buildDataDumpArgs($connection, $database, $ignoreTables));
-            $cmd = $mysqlData->getCommandLine() . ' | ' . $mysql->getCommandLine();
-            $this->runCmd($cmd);
+                $cmd[] = $mysql->getCommandLine();
+                $cmd = implode(' | ', $cmd);
+                $this->runCmd($cmd);
+
+                $mysqlData = new Process(MySqlDump::buildDataDumpArgs($connection, $database, $ignoreTables));
+                $cmd = $mysqlData->getCommandLine() . ' | ' . $mysql->getCommandLine();
+                $this->runCmd($cmd);
+            } catch (\Exception $exception) {
+                $this->logger->error($exception->getMessage());
+                $connection->getSchemaManager()->dropDatabase($branchDatabase);
+                throw  $exception;
+            }
         }
     }
 }
