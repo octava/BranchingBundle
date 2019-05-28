@@ -21,9 +21,16 @@ class Git
         $process = Process::fromShellCommandline('git fetch && git branch -r');
         $process->setWorkingDirectory($dir);
         $process->mustRun();
-
         $output = explode("\n", $process->getOutput());
-        $output = array_filter($output);
+        $remotes = array_filter($output);
+
+        $process = Process::fromShellCommandline('git branch -l');
+        $process->setWorkingDirectory($dir);
+        $process->mustRun();
+        $output = explode("\n", $process->getOutput());
+        $locals = array_filter($output);
+
+        $output = array_unique(array_merge($remotes, $locals));
 
         $branches = [];
         foreach ($output as $row) {
@@ -32,6 +39,7 @@ class Git
             }
         }
 
+        $branches = array_unique($branches);
         usort($branches, [__CLASS__, 'sortBranches']);
 
         return $branches;
