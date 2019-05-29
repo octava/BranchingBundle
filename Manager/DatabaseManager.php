@@ -170,7 +170,7 @@ class DatabaseManager
                 $cmd[] = 'sed -e \'s/DEFINER[ ]*=[ ]*[^*]*\*/\*/\'';
                 $cmd[] = 'sed -e \'s/DEFINER[ ]*=[ ]*[^*]*PROCEDURE/PROCEDURE/\'';
                 $cmd[] = 'sed -e \'s/DEFINER[ ]*=[ ]*[^*]*FUNCTION/FUNCTION/\'';
-                $cmd[] = 'sed -e \'s/`' . $database . '`\./`' . $branchDatabase . '`\./\'';
+                $cmd[] = 'sed -e \'s/`' . $database . '`\./`' . $branchDatabase . '`\./g\'';
 
                 $cmd[] = $mysql->getCommandLine();
                 $cmd = implode(' | ', $cmd);
