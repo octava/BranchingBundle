@@ -5,9 +5,9 @@ namespace Octava\Bundle\BranchingBundle\Manager;
 
 
 use Doctrine\DBAL\Connection;
+use Doctrine\Persistence\ManagerRegistry;
 use Octava\Bundle\BranchingBundle\Config\AlterIncrementConfig;
 use Psr\Log\LoggerInterface;
-use Symfony\Bridge\Doctrine\RegistryInterface;
 
 class AlterIncrementManager
 {
@@ -22,19 +22,19 @@ class AlterIncrementManager
     private $logger;
 
     /**
-     * @var RegistryInterface
+     * @var ManagerRegistry
      */
     private $doctrine;
 
     /**
      * AlterIncrementManager constructor.
      * @param AlterIncrementConfig $config
-     * @param RegistryInterface $doctrine
+     * @param ManagerRegistry $doctrine
      * @param LoggerInterface $logger
      */
     public function __construct(
         AlterIncrementConfig $config,
-        RegistryInterface $doctrine,
+        ManagerRegistry $doctrine,
         LoggerInterface $logger
     ) {
         $this->config = $config;
