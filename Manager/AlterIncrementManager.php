@@ -58,7 +58,7 @@ class AlterIncrementManager
 
             foreach ($map as $tableName => $item) {
                 if (false !== strpos($tableName, ':')) {
-                    $em = $this->doctrine->getEntityManager($connectionName);
+                    $em = $this->doctrine->getManager($connectionName);
                     $tableName = $em->getClassMetadata($tableName)->getTableName();
                 }
 
