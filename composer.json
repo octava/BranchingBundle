@@ -18,7 +18,8 @@
         "symfony/yaml": "~4.4",
         "symfony/monolog-bundle": "^3.3",
         "ext-zlib": "*",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+        "twig/twig": "^3.3"
     },
     "extra": {
         "branch-alias": {

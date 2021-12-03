@@ -3,8 +3,10 @@
 namespace Octava\Bundle\BranchingBundle\Twig;
 
 use Octava\Bundle\BranchingBundle\Helper\Git;
+use Twig\Extension\AbstractExtension;
+use Twig\TwigFunction;
 
-class BranchingExtension extends \Twig_Extension
+class BranchingExtension extends AbstractExtension
 {
     const CURRENT_BRANCH = 'octava_current_branch';
     /**
@@ -36,7 +38,7 @@ class BranchingExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            self::CURRENT_BRANCH => new \Twig_Function(self::CURRENT_BRANCH, [$this, 'getCurrentBranch'])
+            self::CURRENT_BRANCH => new TwigFunction(self::CURRENT_BRANCH, [$this, 'getCurrentBranch'])
         ];
     }
 
